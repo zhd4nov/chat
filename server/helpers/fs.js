@@ -23,7 +23,7 @@ export function readFile(filename) {
           return;
         }
       }
-    )
+    );
   });
 }
 

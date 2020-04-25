@@ -1,8 +1,1 @@
-{
-  "data": [
-    {
-      "id": 1,
-      "name": "test user"
-    }
-  ]
-}
+{"data":[{"id":"wzGMW2wJACR2Ow6YIIHM_","name":"misha","type":"invite"},{"id":"pc0OsA0p5Im_9Z8GcpfMW","name":"vasya","type":"solo"},{"id":"5GW0GV8Rxfy0RL5TPpJt-","name":"dasha","type":"solo"},{"id":"wjdA238Jdv1IdYMjVRN7j","name":"daren'ka","type":"solo"},{"id":"k7ezxk5PtiNwPS4DHia6J","name":"evgen","type":"solo"},{"id":"ZBLB68i0Z4Zr6WYMdE9oT","name":"vasya/","type":"solo"},{"id":"WuSTdSlWP68XY5pkJWo61","name":"denis","type":"solo"},{"id":"ZGI8IUv1d0FbKXQUmMDd8","name":"teste","type":"solo"}]}

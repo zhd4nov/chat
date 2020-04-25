@@ -8,6 +8,8 @@ import morgan from 'morgan';
 import events from './events';
 import { readFile, updateFile } from './helpers/fs';
 
+import userRouter from './components/User/userRouter';
+
 dotenv.config();
 const port = process.env.SOCKET_PORT || 5000;
 const app = express();
@@ -21,6 +23,8 @@ app.get('/users', async (req, res) => {
   const users = await getUsersData();
   res.json(users);
 });
+
+app.use('/users', userRouter);
 
 const server = app.listen(port, () => {
   console.log(`Server up and running on port ${port}`)

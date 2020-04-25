@@ -13,15 +13,32 @@ const IntroModal = ({ createNewUser, rememberCurrentUser, socket }) => {
   })
 
   const [name, setName] = useState('');
+  const [UIState, setUIState] = useState({
+    currentInputState: 'normal',
+  });
 
   const handleInput = (e) => {
     e.preventDefault();
+
+    if (UIState.currentInputState === 'error') {
+      // return default normal state
+      setUIState({ currentInputState: 'normal' });
+    }
+
     setName(e.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (name.length === 0) {
+      // name can't be empty
+      setUIState({ currentInputState: 'error' });
+      return;
+    }
+
     createNewUser(name);
+
     setName(''); // reset input value (i)
   };
 
@@ -31,7 +48,7 @@ const IntroModal = ({ createNewUser, rememberCurrentUser, socket }) => {
         <Form onSubmit={handleSubmit}>
           <Label htmlFor="username">What's your name</Label>
           <Input
-            required
+            currentInputState={UIState.currentInputState}
             id="username"
             name="username"
             type="text"
@@ -81,26 +98,36 @@ const Form = styled.form`
 const Label = styled.label`
   font-size: 1.5em;
   font-weight: 700;
-  color: #333;
+  color: #39393a;
 `
 
+const inputCSSState = {
+  normal: '#ccc',
+  error: 'tomato',
+}
 const Input = styled.input`
-  border: 1px solid #ccc;
   margin-top: auto;
   margin-bottom: 2em;
 
   padding: .6em;
-  color: #333;
+  border: 1px solid ${(props) => inputCSSState[props.currentInputState]};
+  outline: none;
+  color: #39393a;
 `
 const Button = styled.button`
   padding: .6em 0;
   font-weight: 600;
-  color: #333;
-  background: transparent;
-  border: 1px solid #333;
+  color: #fff;
+  background: royalblue;
+  border: 1px solid royalblue;
+  outline: none;
   cursor: pointer;
+  transition: all .2s;
+
+  :hover {
+    background: #0541d4;
+    border: 1px solid #0541d4;
+  }
 `
-
-
 
 export default IntroModal;

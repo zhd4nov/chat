@@ -4,11 +4,13 @@ import cors from 'cors';
 import socket from 'socket.io';
 import path from 'path';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser'
 
 import events from './events';
-import { readFile, updateFile } from './helpers/fs';
+// import { readFile, updateFile } from './helpers/fs';
 
 import userRouter from './components/User/userRouter';
+import User from './components/User/User';
 
 dotenv.config();
 const port = process.env.SOCKET_PORT || 5000;
@@ -17,12 +19,8 @@ const logger = morgan('dev');
 
 app
   .use(cors())
-  .use(logger);
-
-app.get('/users', async (req, res) => {
-  const users = await getUsersData();
-  res.json(users);
-});
+  .use(logger)
+  .use(cookieParser());
 
 app.use('/users', userRouter);
 
@@ -34,13 +32,17 @@ const io = socket(server);
 
 io.on('connection', (socket) => {
   console.log('user connected', socket.id);
+  let currentUser;
+  socket.on(events.ADD_USER_FROM_CLIENT, (name) => {
+    currentUser = new User(socket.id, name);
+    currentUser.save();
 
-  socket.on('disconnect', (socket) => {
-    console.log('user disconnected', socket.id);
-  })
-})
+    socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
+    console.log('Create new user: ', currentUser);
+  });
 
-async function getUsersData() {
-  const data = await readFile('users.json');
-  return data;
-}
+  socket.on('disconnect', () => {
+    currentUser.remove();
+    console.log('user disconnected', currentUser);
+  });
+});

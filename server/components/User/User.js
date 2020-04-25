@@ -1,12 +1,17 @@
 import { nanoid } from 'nanoid';
 import { updateFile, readFile } from '../../helpers/fs';
 
-export default class {
-  // User can be invited (comes by an invitation link) or himself (direct link)
-  constructor(name, type = 'himself') {
-    this.id = nanoid();
+export default class User {
+  // User can be invited (comes by an invitation link) or direct (direct link)
+  constructor(userID, name, type = 'direct') {
+    this.id = userID;
     this.name = name;
     this.type = type;
+  }
+
+  static async getAllUsers() {
+    const data = await readFile('users.json');
+    return data;
   }
 
   getUserID() {
@@ -26,20 +31,15 @@ export default class {
   }
 
   async save() {
-    const users = await this.getAllUsers();
-    console.log(users);
+    const users = await this.constructor.getAllUsers(); // static method
     users.push(this);
     this.updateUsers(users);
   }
 
   async remove() {
-    const currentUsers = await this.getAllUsers();
+    const currentUsers = await this.constructor.getAllUsers(); // static method
     const newUsers = currentUsers.filter((user) => user.id !== this.id);
     this.updateUsers(newUsers);
-  }
-
-  async getAllUsers() {
-    return await readFile('users.json');
   }
 
   async updateUsers(users) {

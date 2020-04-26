@@ -36,20 +36,31 @@ const io = socket(server);
 io.on('connection', (socket) => {
   console.log('user connected', socket.id);
   let currentUser;
-  let defaultChat;
   socket.on(events.ADD_USER_FROM_CLIENT, (name) => {
     currentUser = new User(socket.id, name);
     currentUser.save();
     console.log('Create new user: ', currentUser);
 
+    socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
+  });
+
+  let defaultChat;
+  socket.on(events.ADD_USER_FROM_CLIENT, () => {
     if (currentUser.getUserType() === 'direct') {
       defaultChat = new Chat('iChat', currentUser.getUserID());
       defaultChat.saveChat();
       console.log('Create new chat: ', defaultChat);
-      socket.emit(events.ADD_CHAT_FROM_SERVER, defaultChat);
     }
+    socket.emit(events.ADD_CHAT_FROM_SERVER, defaultChat);
+  });
 
-    socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
+  socket.on(events.ADD_CHAT_FROM_CLIENT, (chatName) => {
+    const currentUserID = currentUser.getUserID();
+    const newChat = new Chat(chatName, currentUserID);
+    newChat.appendMemberID(currentUserID);
+    newChat.saveChat();
+
+    socket.emit(events.ADD_CHAT_FROM_SERVER, newChat);
   });
 
   socket.on('disconnect', async () => {

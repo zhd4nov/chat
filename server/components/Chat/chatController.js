@@ -13,3 +13,10 @@ export const addNewChat = (request, response) => {
 
   response.redirect('/chats');
 }
+
+export const getUserChats = async (request, response) => {
+  const { userid } = request.params;
+  const chats = await Chat.getAllChats();
+  const userChats = chats.filter((chat) => chat.memberIDs.includes(userid));
+  response.json(userChats); // array.json
+}

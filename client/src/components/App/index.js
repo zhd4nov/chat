@@ -32,7 +32,7 @@ const App = () => {
 
   const app = (
     <Fragment>
-      <StatusBar />
+      <StatusBar currentUser={currentUser} />
       <Channels />
       <Messages />
       <Form />
@@ -60,6 +60,7 @@ const AppContainer = styled.div`
   margin: 0 auto;
 
   display: flex;
+  flex-wrap: wrap;
   font-family: sans-serif;
 `
 

@@ -33,9 +33,11 @@ const App = () => {
   const app = (
     <Fragment>
       <StatusBar currentUser={currentUser} />
-      <Channels />
-      <Messages />
-      <Form />
+      <Workspace>
+        <Channels />
+        <Messages />
+        <Form />
+      </Workspace>
     </Fragment>
   );
 
@@ -57,13 +59,20 @@ const AppContainer = styled.div`
   width: 80%;
   max-width: 900px;
   height: 100vh;
+  max-height: 100vh;
   margin: 0 auto;
 
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   font-family: sans-serif;
 `
 
-
+const Workspace = styled.main`
+  width: 100%;
+  height: 90vh;
+  display: flex;
+  flex-flow: row wrap;
+`
 
 export default App;

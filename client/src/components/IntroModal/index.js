@@ -63,6 +63,7 @@ const IntroModal = ({ createNewUser, rememberCurrentUser, socket }) => {
 
 // Styles START
 const Modal = styled.div`
+  box-sizing: unset;
   width: 60vmin;
   height: 25vmin;
   margin: auto;
@@ -86,6 +87,7 @@ const ModalWrapper = styled.div`
 `
 
 const Form = styled.form`
+  box-sizing: unset;
   width: 100%;
   height: 100%;
   margin: auto;
@@ -106,6 +108,7 @@ const inputCSSState = {
   error: 'tomato',
 }
 const Input = styled.input`
+  box-sizing: unset;
   margin-top: auto;
   margin-bottom: 2em;
 
@@ -115,6 +118,7 @@ const Input = styled.input`
   color: #39393a;
 `
 const Button = styled.button`
+  box-sizing: unset;
   padding: .6em 0;
   font-weight: 600;
   color: #fff;

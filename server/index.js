@@ -57,10 +57,16 @@ io.on('connection', (socket) => {
   socket.on(events.ADD_CHAT_FROM_CLIENT, (chatName) => {
     const currentUserID = currentUser.getUserID();
     const newChat = new Chat(chatName, currentUserID);
-    newChat.appendMemberID(currentUserID);
     newChat.saveChat();
 
     socket.emit(events.ADD_CHAT_FROM_SERVER, newChat);
+  });
+
+  socket.on(events.DELETE_CHAT_FROM_CLIENT, async (chatID) => {
+    const chats = await Chat.getAllChats();
+    const newChats = chats.filter((chat) => chat.id !== chatID);
+    await Chat.updateChats(newChats);
+    socket.emit(events.DELETE_CHAT_FROM_SERVER, null);
   });
 
   socket.on('disconnect', async () => {
@@ -72,7 +78,6 @@ io.on('connection', (socket) => {
 });
 
 const removeUserChats = async (userID) => {
-  console.log('loggging...');
   const chats = await Chat.getAllChats();
   const restChats = chats.filter((chat) => chat.hostUserID !== userID);
   Chat.updateChats(restChats);

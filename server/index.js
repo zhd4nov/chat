@@ -12,6 +12,7 @@ import events from './events';
 import userRouter from './components/User/userRouter';
 import User from './components/User/User';
 import chatRouter from './components/Chat/chatRouter';
+import Chat from './components/Chat/Chat';
 
 dotenv.config();
 const port = process.env.SOCKET_PORT || 5000;
@@ -35,16 +36,33 @@ const io = socket(server);
 io.on('connection', (socket) => {
   console.log('user connected', socket.id);
   let currentUser;
+  let defaultChat;
   socket.on(events.ADD_USER_FROM_CLIENT, (name) => {
     currentUser = new User(socket.id, name);
     currentUser.save();
+    console.log('Create new user: ', currentUser);
+
+    if (currentUser.getUserType() === 'direct') {
+      defaultChat = new Chat('iChat', currentUser.getUserID());
+      defaultChat.saveChat();
+      console.log('Create new chat: ', defaultChat);
+      socket.emit(events.ADD_CHAT_FROM_SERVER, defaultChat);
+    }
 
     socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
-    console.log('Create new user: ', currentUser);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
+    // Remove all track where the current user is host
+    await removeUserChats(currentUser.getUserID());
     currentUser.remove();
     console.log('user disconnected', currentUser);
   });
 });
+
+const removeUserChats = async (userID) => {
+  console.log('loggging...');
+  const chats = await Chat.getAllChats();
+  const restChats = chats.filter((chat) => chat.hostUserID !== userID);
+  Chat.updateChats(restChats);
+};

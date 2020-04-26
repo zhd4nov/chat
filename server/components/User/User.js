@@ -17,6 +17,10 @@ export default class User {
     return this.id;
   }
 
+  getUserType() {
+    return this.type;
+  }
+
   getUserName() {
     return this.name;
   }

@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { updateFile, readFile } from '../../helpers/fs';
 
 export default class User {

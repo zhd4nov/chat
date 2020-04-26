@@ -34,7 +34,7 @@ const App = () => {
     <Fragment>
       <StatusBar currentUser={currentUser} />
       <Workspace>
-        <Channels />
+        <Channels socket={socket} />
         <Messages />
         <Form />
       </Workspace>

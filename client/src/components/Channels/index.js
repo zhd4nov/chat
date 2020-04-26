@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Channels = (props) => {
+  const { socket } = props;
+
   return (
     <Container>
       <Chat />

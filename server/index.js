@@ -11,6 +11,7 @@ import events from './events';
 
 import userRouter from './components/User/userRouter';
 import User from './components/User/User';
+import chatRouter from './components/Chat/chatRouter';
 
 dotenv.config();
 const port = process.env.SOCKET_PORT || 5000;
@@ -23,6 +24,7 @@ app
   .use(cookieParser());
 
 app.use('/users', userRouter);
+app.use('/chats', chatRouter);
 
 const server = app.listen(port, () => {
   console.log(`Server up and running on port ${port}`)

@@ -35,8 +35,10 @@ const App = () => {
       <StatusBar currentUser={currentUser} />
       <Workspace>
         <Channels socket={socket} currentUser={currentUser} />
-        <Messages />
-        <Form />
+        <ChatViewport>
+          <Messages />
+          <Form />
+        </ChatViewport>
       </Workspace>
     </Fragment>
   );
@@ -72,7 +74,15 @@ const Workspace = styled.main`
   width: 100%;
   height: 90vh;
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
+`
+
+const ChatViewport = styled.div`
+  width: 80vw;
+  min-height: 100%;
+
+  display: flex;
+  flex-flow: column nowrap;
 `
 
 export default App;

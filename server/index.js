@@ -13,6 +13,9 @@ import User from './components/User/User';
 import chatRouter from './components/Chat/chatRouter';
 import Chat from './components/Chat/Chat';
 
+import messageRouter from './components/Message/messageRouter';
+import Message from './components/Message/Message';
+
 dotenv.config();
 const port = process.env.SOCKET_PORT || 5000;
 const app = express();
@@ -23,15 +26,20 @@ app
   .use(logger)
   .use(cookieParser());
 
+// Routes
 app.use('/users', userRouter);
 app.use('/chats', chatRouter);
+app.use('/messages', messageRouter);
 
+
+// run server
 const server = app.listen(port, () => {
   console.log(`Server up and running on port ${port}`)
 });
-
+// init socket
 const io = socket(server);
 
+// Working with socket
 // TODO: REFACTOR ME PLEASE
 io.on('connection', (socket) => {
   console.log('user connected', socket.id); // CONSOLE (x)
@@ -44,6 +52,7 @@ io.on('connection', (socket) => {
 
     socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
   });
+
   // CHAT-controls
   let defaultChat;
   socket.on(events.ADD_USER_FROM_CLIENT, () => {
@@ -69,6 +78,9 @@ io.on('connection', (socket) => {
     await Chat.updateChats(newChats);
     socket.emit(events.DELETE_CHAT_FROM_SERVER, null);
   });
+
+  // MESSAGE-controls
+
   // RESET stores
   socket.on('disconnect', async () => {
     // Remove all track where the current user is host

@@ -15,15 +15,13 @@ const Messages = (props) => {
 
 const Container = styled.div`
   width: 100%;
-  height: 70%;
+  height: 80%;
+  max-height: 80%;
 
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-end;
-  padding: .5em 1em;
-
-  border-right: 1px solid rgba(0, 0, 0, .1);
-  border-bottom: 1px solid rgba(0, 0, 0, .1);
+  padding: .5em 0 2em;
 `
 
 const Message = styled.div`

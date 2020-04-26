@@ -60,35 +60,42 @@ const Channels = (props) => {
             key={chat.id} />
         ))
       }
-      <Button onClick={handleAddNewChat} >+ New chat</Button>
+      <ButtonWrapper>
+        <Button onClick={handleAddNewChat} >&#43; New chat</Button>
+      </ButtonWrapper>
     </Container>
   );
 };
 
 const Container = styled.div`
   display: flex;
-  flex-flow: row wrap;
-  align-items: flex-start;
-  align-content: flex-start;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-content: center;
+  width: 30vw;
+  border-right: 1px solid #bababa;
+`
+const ButtonWrapper = styled.div`
+  width: 100%;
+  height: 20%;
+  margin-top: auto;
+
+  display: flex;
   justify-content: center;
-  width: 20vw;
-  padding: .5em;
-  border-right: 1px solid rgba(0, 0, 0, .1);
-  border-left: 1px solid rgba(0, 0, 0, .1);
+  align-items: flex-start;
+  padding-top: 1em;
 `
 
 const Button = styled.button`
-  width: 80%;
-  height: 5vh;
-
-  border: 1px solid royalblue;
-  background: royalblue;
-  color: #fff;
+  background: transparent;
+  font-size: 1em;
+  border: none;
+  color: royalblue;
   font-weight: 600;
   cursor: pointer;
 
   :hover {
-    background: #0541d4;
+    color: #0541d4;
   }
 `
 

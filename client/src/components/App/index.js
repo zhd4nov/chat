@@ -6,7 +6,7 @@ import events from '../../events';
 import consts from '../../consts';
 
 import Messages from '../Messages';
-import Form from '../Form';
+import SendingForm from '../SendingForm';
 import Channels from '../Channels';
 import StatusBar from '../StatusBar';
 import IntroModal from '../IntroModal';
@@ -14,15 +14,19 @@ import IntroModal from '../IntroModal';
 const socket = io.connect(consts.SOCKET_URL);
 
 const App = () => {
-  const [currentUser, setCurrentUser] = useState({
-    name: '',
+  const [appState, setAppState] = useState({
+    currentUser: {
+      name: '',
+    },
+    currentChat: null,
   });
+
   const createNewUser = (name) => {
     socket.emit(events.ADD_USER_FROM_CLIENT, name);
   };
 
   const rememberCurrentUser = (user) => { // handle response from server in IntroModal (i)
-    setCurrentUser(user);
+    setAppState({ currentUser: user });
   };
 
   const isExist = (userName) => {
@@ -32,12 +36,12 @@ const App = () => {
 
   const app = (
     <Fragment>
-      <StatusBar currentUser={currentUser} />
+      <StatusBar currentUser={appState.currentUser} />
       <Workspace>
-        <Channels socket={socket} currentUser={currentUser} />
+        <Channels socket={socket} currentUser={appState.currentUser} />
         <ChatViewport>
           <Messages />
-          <Form />
+          <SendingForm />
         </ChatViewport>
       </Workspace>
     </Fragment>
@@ -46,7 +50,7 @@ const App = () => {
   return (
     <AppContainer>
       {
-        isExist(currentUser.name)
+        isExist(appState.currentUser.name)
           ? app
           : <IntroModal
             createNewUser={createNewUser}
@@ -75,14 +79,17 @@ const Workspace = styled.main`
   height: 90vh;
   display: flex;
   flex-flow: row nowrap;
+  border-left: 1px solid #bababa;
+  border-right: 1px solid #bababa;
 `
 
 const ChatViewport = styled.div`
-  width: 80vw;
+  width: 70vw;
   min-height: 100%;
 
   display: flex;
   flex-flow: column nowrap;
+  padding: 0 3em;
 `
 
 export default App;

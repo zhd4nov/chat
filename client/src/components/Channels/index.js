@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import faker from 'faker/locale/fr';
 import styled from 'styled-components';
 
 import events from '../../events';
@@ -11,6 +12,7 @@ const Channels = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // fetching chats contain currentUser 
       const response = await axios.get(`${consts.SOCKET_URL}/chats/${currentUser.id}`);
       setChats(response.data);
     };
@@ -23,8 +25,11 @@ const Channels = (props) => {
   }, [props.source]);
 
   const handleAddNewChat = (e) => {
+    // Simplify naming with faker.js
     e.preventDefault();
-    socket.emit(events.ADD_CHAT_FROM_CLIENT, 'newChat');
+    const fake = faker.hacker.adjective();
+    const chatName = `${fake[0].toUpperCase()}${fake.slice(1)}`;
+    socket.emit(events.ADD_CHAT_FROM_CLIENT, chatName);
   };
 
   return (

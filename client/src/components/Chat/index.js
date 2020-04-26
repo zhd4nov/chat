@@ -1,10 +1,7 @@
 import React from 'react';
-
 import styled from 'styled-components';
 
-import events from '../../events';
-import consts from '../../consts';
-
+// TODO: Rename chat; what's about styles?
 const Chat = ({ chat, handleRemoveChat }) => {
   const { name } = chat;
 
@@ -15,7 +12,6 @@ const Chat = ({ chat, handleRemoveChat }) => {
     </Container>
   );
 };
-
 
 const Container = styled.div`
   position: relative;

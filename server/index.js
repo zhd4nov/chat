@@ -91,7 +91,16 @@ io.on('connection', (socket) => {
     // Write message to file messages.json
     message.saveMessage();
     // Send messages event to ALL sockets
-    // socket.broadcast.emit(events.ADD_MESSAGE_FROM_SERVER, null);
+    io.sockets.emit(events.ADD_MESSAGE_FROM_SERVER, null);
+    console.log('We have a new message: ', message);
+  });
+
+  socket.on(events.DELETE_CHAT_FROM_CLIENT, async (chatId) => {
+    // Remove all messages belong to a deleted chat
+    const messages = await Message.getAllMessages();
+    const restMessages = messages.filter((message) => message.chatId !== chatId);
+    await Message.updateMessages(restMessages);
+    console.log('cleaning is finished. Remove: ', messages.length - restMessages.length);
   });
 
   // RESET stores
@@ -108,5 +117,6 @@ io.on('connection', (socket) => {
 const removeUserChats = async (userID) => {
   const chats = await Chat.getAllChats();
   const restChats = chats.filter((chat) => chat.hostUserID !== userID);
+
   Chat.updateChats(restChats);
 };

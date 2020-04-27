@@ -61,9 +61,20 @@ const App = () => {
     socket.on(events.ADD_CHAT_FROM_SERVER, updateChats);
     socket.on(events.DELETE_CHAT_FROM_SERVER, updateChats);
 
+    const updateMessages = async () => {
+      const messages = await fetchData(resource.messages, appState.currentChatId)();
+      setAppState({
+        ...appState,
+        messages,
+      });
+    };
+
+    socket.on(events.ADD_MESSAGE_FROM_SERVER, updateMessages);
+
     return () => {
       socket.off(events.ADD_CHAT_FROM_SERVER, updateChats);
       socket.off(events.DELETE_CHAT_FROM_SERVER, updateChats);
+      socket.off(events.ADD_MESSAGE_FROM_SERVER, updateMessages);
     }
   })
 
@@ -101,7 +112,7 @@ const App = () => {
           currentChatId={appState.currentChatId}
           handleCurrentChat={handleCurrentChat} />
         <ChatViewport>
-          <Messages />
+          <Messages messages={appState.messages} />
           <SendingForm onSubmit={handleNewMessage} />
         </ChatViewport>
       </Workspace>

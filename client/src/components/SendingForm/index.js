@@ -15,11 +15,18 @@ const SendingForm = ({ onSubmit }) => {
     setMessage('');
   }
 
+  const handleEnterSend = (e) => {
+    if (e.keyCode === 13 && e.shiftKey === false) {
+      handleSubmit(e);
+    }
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <Message
         placeholder="Write a massage..."
         onChange={handleInput}
+        onKeyDown={handleEnterSend}
         value={message} />
       <SendButton>Send</SendButton>
     </Form>

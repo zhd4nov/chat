@@ -8,7 +8,8 @@ export default class Message {
     this.authorName = userName;
     this.authorId = userId;
     this.chatId = chatId; // Always one
-    this.timestamp = '16:30'; // TODO: Set a real timestamp
+    this.timestamp = new Date(); // REFACTOR ME (x)
+    this.time = `${this.timestamp.getHours()}:${this.timestamp.getMinutes()}`;
   }
 
   static async getAllMessages() {
@@ -18,17 +19,11 @@ export default class Message {
 
   static async getMessagesByChatId(chatId) {
     const allMessages = await this.getAllMessages();
-    const messagesByChatID = allMessages.filter((msg) => msg.chatID === chatId);
+    const messagesByChatID = allMessages.filter((msg) => msg.chatId === chatId);
     return messagesByChatID;
   }
 
-  async saveMessage() {
-    const messages = await this.constructor.getAllMessages();
-    messages.push(this);
-    this.updateMessages(messages);
-  }
-
-  async updateMessages(messages) {
+  static async updateMessages(messages) {
     try {
       await updateFile('messages.json', messages);
       return true;
@@ -36,6 +31,12 @@ export default class Message {
       console.log('Error update messages', err);
       return false;
     }
+  }
+
+  async saveMessage() {
+    const messages = await this.constructor.getAllMessages();
+    messages.push(this);
+    this.constructor.updateMessages(messages);
   }
   // Delete messages by chatIDs implement .on(disconnect) (i)
 }

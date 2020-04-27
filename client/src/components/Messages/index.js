@@ -1,14 +1,45 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { Scrollbars } from 'react-custom-scrollbars';
 
-const Messages = (props) => {
+
+
+const Messages = ({ messages }) => {
+  const messagesEnd = useRef(null);
+
+  const scrollToBottom = () => {
+    if (!messagesEnd) {
+      return;
+    }
+    messagesEnd.current.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  });
+
   return (
     <Container>
-      <Message>
-        <Author>Evgeny</Author>
-        <Text>Hi! How are you doing?</Text>
-        <Timestamp>14:30</Timestamp>
-      </Message>
+      <Scrollbars
+        style={{ height: '480px', width: '100%' }}
+        renderView={props => (
+          <div {...props} style={{ ...props.style, overflowX: 'hidden', paddingTop: '1em' }} />
+        )}>
+        {
+          messages.map((message) => {
+            const { authorName, id: messageId, text, time } = message;
+
+            return (
+              <Message key={messageId} >
+                <Author>{authorName}</Author>
+                <Text>{text}</Text>
+                <Timestamp>{time}</Timestamp>
+              </Message>
+            );
+          })
+        }
+        <div ref={messagesEnd} />
+      </Scrollbars>
     </Container>
   );
 };
@@ -22,12 +53,17 @@ const Container = styled.div`
   flex-flow: column nowrap;
   justify-content: flex-end;
   padding: .5em 0 2em;
+  > div {
+    overflow: hidden;
+    box-sizing: border-box;
+  }
 `
 
 const Message = styled.div`
   position: relative;
   width: 60%;
   padding: 2em 1em 1em;
+  margin-bottom: .5em;
 
   background: rgba(0, 0, 0, .1);
   border-radius: .2em;
@@ -36,7 +72,7 @@ const Message = styled.div`
 const Author = styled.span`
   position: absolute;
   top: .5em;
-  left: .5em;
+  left: 1em;
 
   font-size: .8em;
 `
@@ -47,10 +83,9 @@ const Text = styled.p`
 const Timestamp = styled.span`
   position: absolute;
   top: .5em;
-  right: .5em;
+  right: 1em;
 
   font-size: .8em;
   color: #39393a;
 `
-
 export default Messages;

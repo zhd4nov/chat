@@ -6,7 +6,7 @@ const Messages = (props) => {
     <Container>
       <Message>
         <Author>Evgeny</Author>
-        <Text>Hi! I love you, guys.</Text>
+        <Text>Hi! How are you doing?</Text>
         <Timestamp>14:30</Timestamp>
       </Message>
     </Container>

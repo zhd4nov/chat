@@ -26,8 +26,10 @@ const App = () => {
   };
 
   const rememberCurrentUser = (user) => { // handle response from server in IntroModal (i)
-    setAppState({ currentUser: user });
+    setAppState({ ...appState, currentUser: user });
   };
+
+  const handleCurrentChat = (id) => () => setAppState({ ...appState, currentChat: id });
 
   const isExist = (userName) => {
     const exist = userName.length !== 0;
@@ -38,7 +40,11 @@ const App = () => {
     <Fragment>
       <StatusBar currentUser={appState.currentUser} />
       <Workspace>
-        <Channels socket={socket} currentUser={appState.currentUser} />
+        <Channels
+          socket={socket}
+          currentUser={appState.currentUser}
+          currentChat={appState.currentChat}
+          handleCurrentChat={handleCurrentChat} />
         <ChatViewport>
           <Messages />
           <SendingForm />

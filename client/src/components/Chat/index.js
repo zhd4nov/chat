@@ -1,25 +1,44 @@
 import React from 'react';
 import styled from 'styled-components';
 
-// TODO: Rename chat; what's about styles?
-const Chat = ({ chat, handleRemoveChat }) => {
-  //TODO: Add active chat and separate styles (!)
+// TODO: Rename chat (in future)
+const Chat = ({ chat, currentChat, handleCurrentChat, handleRemoveChat }) => {
   const { name } = chat;
 
-  return (
-    <Container>
-      <Title>{name}</Title>
+  const isCurrentChat = () => {
+    if (!currentChat) {
+      // if render a first single chat, this chat is current
+      handleCurrentChat(chat.id)(); // REFACTOR:TODO:FIXME
+    }
+
+    return chat.id === currentChat;
+  };
+
+  // Define component option:
+  const activeChat = (
+    <CurrentChatContainer>
+      <Title active>{name}</Title>
       <CloseCross onClick={handleRemoveChat} >&#10006;</CloseCross>
+    </CurrentChatContainer>
+  );
+
+  const inactiveChat = (
+    <Container onClick={handleCurrentChat(chat.id)}>
+      <Title >{name}</Title>
     </Container>
   );
+  // render component with the right style
+  return isCurrentChat() ? activeChat : inactiveChat;
 };
 
+// Style START
 const Container = styled.div`
   position: relative;
   width: 100%;
   height: 7vh;
 
   display: flex;
+  background: ${(props) => props.active ? '#' : 'transparent'};
   cursor: pointer;
 
   ::after {
@@ -35,10 +54,18 @@ const Container = styled.div`
   }
 `
 
+const CurrentChatContainer = styled(Container)`
+  background: #e5e5e5;
+
+  ::after {
+    display: none;
+  }
+`
+
 const Title = styled.p`
   width: fit-content;
   margin: auto;
-  color: #bababa;
+  color: ${(props) => props.active ? 'royalblue' : '#bababa'};
 `
 
 const CloseCross = styled.button`

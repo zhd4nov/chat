@@ -62,7 +62,7 @@ const App = () => {
     socket.on(events.DELETE_CHAT_FROM_SERVER, updateChats);
 
     const updateMessages = async () => {
-      const messages = await fetchData(resource.messages, appState.currentChatId)();
+      const messages = await fetchData(resource.messages)();
       setAppState({
         ...appState,
         messages,
@@ -112,7 +112,9 @@ const App = () => {
           currentChatId={appState.currentChatId}
           handleCurrentChat={handleCurrentChat} />
         <ChatViewport>
-          <Messages messages={appState.messages} />
+          <Messages
+            messages={appState.messages}
+            currentChatId={appState.currentChatId} />
           <SendingForm onSubmit={handleNewMessage} />
         </ChatViewport>
       </Workspace>

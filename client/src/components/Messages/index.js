@@ -4,7 +4,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 
 
 
-const Messages = ({ messages }) => {
+const Messages = ({ messages, currentChatId }) => {
   const messagesEnd = useRef(null);
 
   const scrollToBottom = () => {
@@ -19,24 +19,26 @@ const Messages = ({ messages }) => {
   });
 
   return (
-    <Container>
+    <Container currentChatId >
       <Scrollbars
         style={{ height: '480px', width: '100%' }}
         renderView={props => (
           <div {...props} style={{ ...props.style, overflowX: 'hidden', paddingTop: '1em' }} />
         )}>
         {
-          messages.map((message) => {
-            const { authorName, id: messageId, text, time } = message;
+          messages
+            .filter((message) => message.chatId === currentChatId)
+            .map((message) => {
+              const { authorName, id: messageId, text, time } = message;
 
-            return (
-              <Message key={messageId} >
-                <Author>{authorName}</Author>
-                <Text>{text}</Text>
-                <Timestamp>{time}</Timestamp>
-              </Message>
-            );
-          })
+              return (
+                <Message key={messageId} >
+                  <Author>{authorName}</Author>
+                  <Text>{text}</Text>
+                  <Timestamp>{time}</Timestamp>
+                </Message>
+              );
+            })
         }
         <div ref={messagesEnd} />
       </Scrollbars>

@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import axios from 'axios';
 import styled from 'styled-components';
 
 import events from '../../events';
@@ -19,7 +20,18 @@ const App = () => {
       name: '',
     },
     currentChat: null,
+    messages: []
   });
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      // fetching chats contain currentUser 
+      const response = await axios.get(`${consts.SOCKET_URL}/messages/${appState.currentChat}`);
+      setAppState({ ...appState, messages: response.data });
+    };
+
+    socket.on(events.ADD_MESSAGE_FROM_SERVER, fetchMessages);
+  }, []);
 
   const createNewUser = (name) => {
     socket.emit(events.ADD_USER_FROM_CLIENT, name);
@@ -30,6 +42,13 @@ const App = () => {
   };
 
   const handleCurrentChat = (id) => () => setAppState({ ...appState, currentChat: id });
+
+  const handleNewMessage = (messageText) => {
+    socket.emit(
+      events.ADD_MESSAGE_FROM_CLIENT,
+      { newMessage: messageText, chatId: appState.currentChat },
+    );
+  }
 
   const isExist = (userName) => {
     const exist = userName.length !== 0;
@@ -47,7 +66,7 @@ const App = () => {
           handleCurrentChat={handleCurrentChat} />
         <ChatViewport>
           <Messages />
-          <SendingForm />
+          <SendingForm onSubmit={handleNewMessage} />
         </ChatViewport>
       </Workspace>
     </Fragment>
@@ -55,9 +74,9 @@ const App = () => {
 
   return (
     <AppContainer>
-      {
+      { // First, ask user name
         isExist(appState.currentUser.name)
-          ? app
+          ? app // if user name is exist return our app
           : <IntroModal
             createNewUser={createNewUser}
             rememberCurrentUser={rememberCurrentUser}

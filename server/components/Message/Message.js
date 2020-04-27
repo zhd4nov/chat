@@ -1,9 +1,10 @@
-import nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 import { readFile, updateFile } from "../../helpers/fs";
 
 export default class Message {
-  constructor(userId, userName, chatId) {
+  constructor(userId, userName, chatId, text) {
     this.id = nanoid();
+    this.text = text;
     this.authorName = userName;
     this.authorId = userId;
     this.chatId = chatId; // Always one

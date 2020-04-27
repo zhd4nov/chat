@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const SendingForm = (props) => {
+const SendingForm = ({ onSubmit }) => {
   const [message, setMessage] = useState('');
 
   const handleInput = (e) => {
@@ -9,8 +9,14 @@ const SendingForm = (props) => {
     setMessage(e.target.value);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(message);
+    setMessage('');
+  }
+
   return (
-    <Form>
+    <Form onSubmit={handleSubmit}>
       <Message
         placeholder="Write a massage..."
         onChange={handleInput}

@@ -80,6 +80,19 @@ io.on('connection', (socket) => {
   });
 
   // MESSAGE-controls
+  socket.on(events.ADD_MESSAGE_FROM_CLIENT, ({ newMessage, chatId }) => {
+    //Create a new message
+    const message = new Message(
+      currentUser.getUserID(),
+      currentUser.getUserName(),
+      chatId,
+      newMessage,
+    );
+    // Write message to file messages.json
+    message.saveMessage();
+    // Send messages event to ALL sockets
+    // socket.broadcast.emit(events.ADD_MESSAGE_FROM_SERVER, null);
+  });
 
   // RESET stores
   socket.on('disconnect', async () => {

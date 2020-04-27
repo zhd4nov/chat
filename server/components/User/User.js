@@ -31,7 +31,7 @@ export default class User {
     this.name = name;
     // return new name
     return this.name;
-  }
+  } // TODO: implement feture
 
   async save() {
     const users = await this.constructor.getAllUsers(); // static method

@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 // TODO: Rename chat (in future)
-const Chat = ({ chat, currentChat, handleCurrentChat, handleRemoveChat }) => {
+const Chat = ({ chat, currentChatId, handleCurrentChat, handleRemoveChat }) => {
   const { name } = chat;
 
-  const isCurrentChat = () => chat.id === currentChat;
+  const isCurrentChat = () => chat.id === currentChatId;
 
   // Define component option:
   const activeChat = (

@@ -44,8 +44,8 @@ const App = () => {
   const [appState, setAppState] = useState({
     currentUser: { name: '' }, // REFACTOR: Need to put a real user object
     chats: [], // All chats owned by appState.currentUser
-    currentChat: null, // if !currentChat then currentChat will be equal first chat in appState.chats
-    messages: [], // Messages from appState.currentChat
+    currentChatId: null, // Will be defined in UseEffect hook
+    messages: [], // Messages from appState.currentChatId
   });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const App = () => {
       setAppState({
         ...appState,
         chats,
-        currentChat: chats[0]['id'],
+        currentChatId: chats[0]['id'],
       });
     };
 
@@ -76,12 +76,12 @@ const App = () => {
     setAppState({ ...appState, currentUser: user });
   };
 
-  const handleCurrentChat = (id) => () => setAppState({ ...appState, currentChat: id });
+  const handleCurrentChat = (id) => () => setAppState({ ...appState, currentChatId: id });
 
   const handleNewMessage = (messageText) => {
     socket.emit(
       events.ADD_MESSAGE_FROM_CLIENT,
-      { newMessage: messageText, chatId: appState.currentChat },
+      { newMessage: messageText, chatId: appState.currentChatId },
     );
   }
 
@@ -98,7 +98,7 @@ const App = () => {
           chats={appState.chats}
           socket={socket}
           currentUser={appState.currentUser}
-          currentChat={appState.currentChat}
+          currentChatId={appState.currentChatId}
           handleCurrentChat={handleCurrentChat} />
         <ChatViewport>
           <Messages />

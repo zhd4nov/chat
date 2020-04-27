@@ -9,7 +9,7 @@ import consts from '../../consts';
 import Chat from '../Chat';
 
 const Channels = (props) => {
-  const { handleCurrentChat, currentChat, currentUser, socket } = props;
+  const { handleCurrentChat, currentChatId, currentUser, socket } = props;
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const Channels = (props) => {
         chats.map((chat) => (
           <Chat
             chat={chat}
-            currentChat={currentChat}
+            currentChatId={currentChatId}
             // next function uses closure and return handler
             handleCurrentChat={handleCurrentChat}
             handleRemoveChat={handleRemoveChat(chat, currentUser.id)}

@@ -5,14 +5,7 @@ import styled from 'styled-components';
 const Chat = ({ chat, currentChat, handleCurrentChat, handleRemoveChat }) => {
   const { name } = chat;
 
-  const isCurrentChat = () => {
-    if (!currentChat) {
-      // if render a first single chat, this chat is current
-      handleCurrentChat(chat.id)(); // REFACTOR:TODO:FIXME
-    }
-
-    return chat.id === currentChat;
-  };
+  const isCurrentChat = () => chat.id === currentChat;
 
   // Define component option:
   const activeChat = (

@@ -14,30 +14,65 @@ import IntroModal from '../IntroModal';
 
 const socket = io.connect(consts.SOCKET_URL);
 
+// Use closure to building a universal fetch
+const fetchData = (resource, ...restPath) => async () => {
+  // ** [, ...restPath] is optional, should contain strings **
+  let path;
+  if (restPath.length > 0) {
+    path = restPath.join('/') // restPath contains something
+  } else {
+    path = ''; // restPath is empty
+  }
+
+  // Use destructuring to get data from server response
+  const { data } = await axios.get(
+    `${consts.SOCKET_URL}/${resource}/${path}`,
+  );
+
+  return data;
+};
+
+// Resources for request builder
+const resource = {
+  messages: 'messages',
+  chats: 'chats',
+  users: 'users',
+};
+
 const App = () => {
+  // Init appState - single source of truth
   const [appState, setAppState] = useState({
-    currentUser: {
-      name: '',
-    },
-    currentChat: null,
-    messages: []
+    currentUser: { name: '' }, // REFACTOR: Need to put a real user object
+    chats: [], // All chats owned by appState.currentUser
+    currentChat: null, // if !currentChat then currentChat will be equal first chat in appState.chats
+    messages: [], // Messages from appState.currentChat
   });
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      // fetching chats contain currentUser 
-      const response = await axios.get(`${consts.SOCKET_URL}/messages/${appState.currentChat}`);
-      setAppState({ ...appState, messages: response.data });
+    const updateChats = async () => {
+      const chats = await fetchData(resource.chats)();
+      setAppState({
+        ...appState,
+        chats,
+        currentChat: chats[0]['id'],
+      });
     };
 
-    socket.on(events.ADD_MESSAGE_FROM_SERVER, fetchMessages);
-  }, []);
+    socket.on(events.ADD_CHAT_FROM_SERVER, updateChats);
+    socket.on(events.DELETE_CHAT_FROM_SERVER, updateChats);
+
+    return () => {
+      socket.off(events.ADD_CHAT_FROM_SERVER, updateChats);
+      socket.off(events.DELETE_CHAT_FROM_SERVER, updateChats);
+    }
+  })
 
   const createNewUser = (name) => {
     socket.emit(events.ADD_USER_FROM_CLIENT, name);
   };
 
-  const rememberCurrentUser = (user) => { // handle response from server in IntroModal (i)
+  const rememberCurrentUser = (user) => {
+    // handle response from server in IntroModal (i)
     setAppState({ ...appState, currentUser: user });
   };
 
@@ -60,6 +95,7 @@ const App = () => {
       <StatusBar currentUser={appState.currentUser} />
       <Workspace>
         <Channels
+          chats={appState.chats}
           socket={socket}
           currentUser={appState.currentUser}
           currentChat={appState.currentChat}

@@ -71,17 +71,8 @@ const Friends = styled.span`
   margin: 0 1.5em;
   font-variant: small-caps;
   font-weight: 600;
-  cursor: pointer;
-  transition: all .2s;
-
-  :hover {
-    transform: rotate(5deg);
-    text-shadow: 0 0 1em rgba(255, 255, 255, 0.1);
-  }
-  :active {
-    position: relative;
-    top: .2em;
-  }
+  cursor: wait;
+  color: gray;  
 `
 
 export default StatusBar;

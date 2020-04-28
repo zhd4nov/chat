@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import consts from '../../consts';
 
-const StatusBar = ({ currentUser }) => {
+const StatusBar = ({ currentUser, currentChatId }) => {
   const { name } = currentUser;
+  const inviteLink = `${consts.SOCKET_URL}/users/invite/${currentChatId}`;
+
+  const handleCopyLink = (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(e.target.getAttribute('href')).then(() => {
+      console.log('success');
+    }, () => {
+      console.log('fail');
+    });
+  }
 
   return (
     <Container>
       <Avatar />
       {/* Status Bar has font-variant: small-caps. Format text to lower case. */}
       <Name>{name.toLowerCase()}</Name>
+      <a href={inviteLink} onClick={handleCopyLink}>copy invite link</a>
       <Friends>who's online in this chat</Friends>
     </Container>
   );
@@ -22,6 +34,12 @@ const Container = styled.header`
   align-items: center;
   background: royalblue;
   color: #fff;
+
+  >a {
+    color: #fff;
+    font-variant: small-caps;
+    margin: 0 auto;
+  }
 `
 
 const Avatar = styled.div`

@@ -1,7 +1,7 @@
 import { updateFile, readFile } from '../../helpers/fs';
 
 export default class User {
-  // User can be invited (comes by an invitation link) or direct (direct link)
+  // User can be invite (comes by an invitation link) or direct (direct link)
   constructor(userID, name, type = 'direct') {
     this.id = userID;
     this.name = name;

@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import cookie from 'js-cookie';
 import axios from 'axios';
 import styled from 'styled-components';
 
@@ -42,6 +43,7 @@ const resource = {
 const App = () => {
   // Init appState - single source of truth
   const [appState, setAppState] = useState({
+    users: [], // Actual a user list
     currentUser: { name: '' }, // REFACTOR: Need to put a real user object
     chats: [], // All chats owned by appState.currentUser
     currentChatId: null, // Will be defined in UseEffect hook
@@ -54,12 +56,10 @@ const App = () => {
       setAppState({
         ...appState,
         chats,
-        currentChatId: chats[0]['id'],
+        currentChatId: chats.length > 0 ? chats[0]['id'] : null,
       });
+      console.log('Update chats... yeah: ', chats); // CONSOLE (x
     };
-
-    socket.on(events.ADD_CHAT_FROM_SERVER, updateChats);
-    socket.on(events.DELETE_CHAT_FROM_SERVER, updateChats);
 
     const updateMessages = async () => {
       const messages = await fetchData(resource.messages)();
@@ -67,24 +67,63 @@ const App = () => {
         ...appState,
         messages,
       });
+      console.log('Update messages... yeah'); // CONSOLE (x)
     };
+
+    const updateUsers = (user) => {
+      // handle response from server in IntroModal (i)
+      setAppState({
+        ...appState,
+        users: [...appState.users, user],
+      });
+      console.log('Update users... yeah\n', user); // CONSOLE (x
+    };
+
+    const updateCurrentUser = (user) => {
+      setAppState({ ...appState, currentUser: user });
+    }
+
+    socket.on(events.ADD_USER_FROM_SERVER, updateUsers);
+    socket.on(events.ADD_USER_FROM_SERVER, updateCurrentUser);
+
+    socket.on(events.ADD_CHAT_FROM_SERVER, updateChats);
+
+    socket.on(events.DELETE_CHAT_FROM_SERVER, updateMessages);
+    socket.on(events.DELETE_CHAT_FROM_SERVER, updateChats);
 
     socket.on(events.ADD_MESSAGE_FROM_SERVER, updateMessages);
 
+    socket.on(events.ADD_FRIEND_FROM_SERVER, updateUsers);
+    socket.on(events.ADD_FRIEND_FROM_SERVER, updateMessages);
+    socket.on(events.ADD_FRIEND_FROM_SERVER, updateChats);
+
     return () => {
       socket.off(events.ADD_CHAT_FROM_SERVER, updateChats);
+      socket.off(events.DELETE_CHAT_FROM_SERVER, updateMessages);
       socket.off(events.DELETE_CHAT_FROM_SERVER, updateChats);
       socket.off(events.ADD_MESSAGE_FROM_SERVER, updateMessages);
+      socket.off(events.ADD_USER_FROM_SERVER, updateUsers);
+      socket.off(events.ADD_USER_FROM_SERVER, updateCurrentUser);
+
+      socket.off(events.ADD_FRIEND_FROM_SERVER, updateUsers);
+      socket.off(events.ADD_FRIEND_FROM_SERVER, updateMessages);
+      socket.off(events.ADD_FRIEND_FROM_SERVER, updateChats);
     }
   })
 
   const createNewUser = (name) => {
-    socket.emit(events.ADD_USER_FROM_CLIENT, name);
-  };
-
-  const rememberCurrentUser = (user) => {
-    // handle response from server in IntroModal (i)
-    setAppState({ ...appState, currentUser: user });
+    // Get user invite
+    const chatId = cookie.get('invite');
+    // And return Boolean
+    const hasInvite = !!chatId;
+    // Create user data
+    const userInfo = {
+      hasInvite,
+      chatId,
+      name,
+    }
+    // Send user data
+    socket.emit(events.ADD_USER_FROM_CLIENT, userInfo);
   };
 
   const handleCurrentChat = (id) => () => setAppState({ ...appState, currentChatId: id });
@@ -103,7 +142,7 @@ const App = () => {
 
   const app = (
     <Fragment>
-      <StatusBar currentUser={appState.currentUser} />
+      <StatusBar currentUser={appState.currentUser} currentChatId={appState.currentChatId} />
       <Workspace>
         <Channels
           chats={appState.chats}
@@ -126,10 +165,7 @@ const App = () => {
       { // First, ask user name
         isExist(appState.currentUser.name)
           ? app // if user name is exist return our app
-          : <IntroModal
-            createNewUser={createNewUser}
-            rememberCurrentUser={rememberCurrentUser}
-            socket={socket} />
+          : <IntroModal createNewUser={createNewUser} />
       }
     </AppContainer>
   );

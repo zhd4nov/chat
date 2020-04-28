@@ -45,23 +45,56 @@ io.on('connection', (socket) => {
   console.log('user connected', socket.id); // CONSOLE (x)
   // USER-controlls
   let currentUser;
-  socket.on(events.ADD_USER_FROM_CLIENT, (name) => {
-    currentUser = new User(socket.id, name);
-    currentUser.save();
-    console.log('Create new user: ', currentUser); // CONSOLE (x)
-
-    socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
+  socket.on(events.ADD_USER_FROM_CLIENT, (userInfo) => {
+    // Unzip user info
+    const { hasInvite, name } = userInfo;
+    // Check user type
+    if (!hasInvite) {
+      // Create a new user without an invitation
+      currentUser = new User(socket.id, name, 'direct');
+      // Save new user and log
+      currentUser.save();
+      // Response to client - 200 ok buddy
+      socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
+      console.log('Create new user: ', currentUser); // CONSOLE (x)
+    } else {
+      // Has invite - create a new user with invite
+      currentUser = new User(socket.id, name, 'invite');
+      // Save new user and log
+      currentUser.save();
+      // Response to client - 200 ok buddy
+      socket.emit(events.ADD_USER_FROM_SERVER, currentUser);
+      console.log('Add new friend: ', currentUser); // CONSOLE (x)
+    }
   });
 
   // CHAT-controls
   let defaultChat;
-  socket.on(events.ADD_USER_FROM_CLIENT, () => {
-    if (currentUser.getUserType() === 'direct') {
+  socket.on(events.ADD_USER_FROM_CLIENT, async ({ hasInvite, chatId }) => {
+    // Check user type
+    if (!hasInvite) {
+      // Create a new default chat
       defaultChat = new Chat('iChat', currentUser.getUserID());
+      // Save a new chat
       defaultChat.saveChat();
+      // Response to client - 200 ok buddy
+      socket.emit(events.ADD_CHAT_FROM_SERVER, defaultChat);
+      // log
       console.log('Create new chat: ', defaultChat); // CONSOLE (x)
+    } else {
+      // User is invited, get the right chat
+      const allChats = await Chat.getAllChats();
+      const [targetChat] = allChats.filter((chat) => chat.id === chatId);
+      // Append current user as a member
+      targetChat.memberIDs.push(currentUser.getUserID());
+      // Update chats
+      const newChats = Array.from(new Set([...allChats, targetChat]));
+      await Chat.updateChats(newChats);
+      // Response to client - 200 ok buddy
+      io.sockets.emit(events.ADD_FRIEND_FROM_SERVER, targetChat);
+      // log
+      console.log('New invite: ', targetChat); // CONSOLE (x)
     }
-    socket.emit(events.ADD_CHAT_FROM_SERVER, defaultChat);
   });
 
   socket.on(events.ADD_CHAT_FROM_CLIENT, (chatName) => {
@@ -70,6 +103,7 @@ io.on('connection', (socket) => {
     newChat.saveChat();
 
     socket.emit(events.ADD_CHAT_FROM_SERVER, newChat);
+    console.log(`New chat was cteated by user: ${newChat}`);
   });
 
   socket.on(events.DELETE_CHAT_FROM_CLIENT, async (chatID) => {
@@ -100,7 +134,7 @@ io.on('connection', (socket) => {
     const messages = await Message.getAllMessages();
     const restMessages = messages.filter((message) => message.chatId !== chatId);
     await Message.updateMessages(restMessages);
-    console.log('cleaning is finished. Remove: ', messages.length - restMessages.length);
+    console.log('User remove chat. Removing messages... Removed: ', messages.length - restMessages.length, chatId);
   });
 
   // RESET stores
@@ -109,7 +143,7 @@ io.on('connection', (socket) => {
     await removeUserChats(currentUser.getUserID());
     // Remove user when socket is dead
     currentUser.remove();
-    console.log('user disconnected', currentUser); // CONSOLE (x)
+    console.log('User disconnected', currentUser); // CONSOLE (x)
   });
 });
 

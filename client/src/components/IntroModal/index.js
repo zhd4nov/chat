@@ -3,14 +3,7 @@ import styled from 'styled-components';
 
 import events from '../../events';
 
-const IntroModal = ({ createNewUser, rememberCurrentUser, socket }) => {
-  useEffect(() => {
-    socket.on(events.ADD_USER_FROM_SERVER, rememberCurrentUser);
-
-    return () => { // unsubscribe
-      socket.off(events.ADD_USER_FROM_SERVER, rememberCurrentUser);
-    }
-  })
+const IntroModal = ({ createNewUser }) => {
 
   const [name, setName] = useState('');
   const [UIState, setUIState] = useState({

@@ -1,34 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import faker from 'faker';
 import styled from 'styled-components';
 
 import events from '../../events';
-import consts from '../../consts';
 
 import Chat from '../Chat';
 
 const Channels = (props) => {
-  const { handleCurrentChat, currentChatId, currentUser, socket } = props;
-  const [chats, setChats] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      // fetching chats contain currentUser 
-      const response = await axios.get(`${consts.SOCKET_URL}/chats/${currentUser.id}`);
-      setChats(response.data);
-    };
-    // subscribe - update chats
-    socket.on(events.ADD_CHAT_FROM_SERVER, fetchData);
-    socket.on(events.DELETE_CHAT_FROM_SERVER, fetchData);
-
-    // TODO: Notify rest user 
-
-    return () => { // unsubscribe
-      socket.off(events.ADD_CHAT_FROM_SERVER, fetchData);
-      socket.off(events.DELETE_CHAT_FROM_SERVER, fetchData);
-    }
-  }, [props.source]);
+  const { handleCurrentChat, currentChatId, currentUser, socket, chats } = props;
 
   const handleAddNewChat = (e) => {
     // Simplify naming with faker.js
@@ -38,10 +17,10 @@ const Channels = (props) => {
     socket.emit(events.ADD_CHAT_FROM_CLIENT, chatName);
   };
 
-  const handleRemoveChat = (chat, currentUserID) => (e) => {
+  const handleRemoveChat = (chat, currentUserId) => (e) => {
     e.preventDefault();
     // Only hostUser can do it (!) check...
-    if (chat.hostUserID === currentUserID) {
+    if (chat.hostUserID === currentUserId) {
       socket.emit(events.DELETE_CHAT_FROM_CLIENT, chat.id)
     } else {
       // TODO: set behavior if forbiden
@@ -51,15 +30,17 @@ const Channels = (props) => {
   return (
     <Container>
       {
-        chats.map((chat) => (
-          <Chat
-            chat={chat}
-            currentChatId={currentChatId}
-            // next function uses closure and return handler
-            handleCurrentChat={handleCurrentChat}
-            handleRemoveChat={handleRemoveChat(chat, currentUser.id)}
-            key={chat.id} />
-        ))
+        chats
+          .filter(({ memberIDs }) => memberIDs.includes(currentUser.id))
+          .map((chat) => (
+            <Chat
+              chat={chat}
+              currentChatId={currentChatId}
+              // next function uses closure and return handler
+              handleCurrentChat={handleCurrentChat}
+              handleRemoveChat={handleRemoveChat(chat, currentUser.id)}
+              key={chat.id} />
+          ))
       }
       <ButtonWrapper>
         <Button onClick={handleAddNewChat} >&#43; New chat</Button>

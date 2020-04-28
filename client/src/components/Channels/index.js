@@ -72,12 +72,14 @@ const Button = styled.button`
   background: transparent;
   font-size: 1em;
   border: none;
+  outline: none;
   color: royalblue;
   font-weight: 600;
   cursor: pointer;
+  transition: .2s all;
 
-  :hover {
-    color: #0541d4;
+  :active {
+    filter: sepia(1.5);
   }
 `
 

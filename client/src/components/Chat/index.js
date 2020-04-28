@@ -48,10 +48,8 @@ const Container = styled.div`
 `
 
 const CurrentChatContainer = styled(Container)`
-  background: #e5e5e5;
-
   ::after {
-    display: none;
+    background: royalblue;
   }
 `
 
@@ -63,8 +61,8 @@ const Title = styled.p`
 
 const CloseCross = styled.button`
   position: absolute;
-  top: .5em;
-  right: .5em;
+  top: 1em;
+  left: 10%;
 
   border: none;
   outline: none;

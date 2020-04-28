@@ -4,7 +4,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 
 
 
-const Messages = ({ messages, currentChatId }) => {
+const Messages = ({ messages, currentChatId, currentUser }) => {
   const messagesEnd = useRef(null);
 
   const scrollToBottom = () => {
@@ -29,10 +29,15 @@ const Messages = ({ messages, currentChatId }) => {
           messages
             .filter((message) => message.chatId === currentChatId)
             .map((message) => {
-              const { authorName, id: messageId, text, time } = message;
+              const {
+                authorId,
+                authorName,
+                id: messageId,
+                text,
+                time } = message;
 
               return (
-                <Message key={messageId} >
+                <Message right={authorId === currentUser.id} key={messageId} >
                   <Author>{authorName}</Author>
                   <Text>{text}</Text>
                   <Timestamp>{time}</Timestamp>
@@ -60,14 +65,26 @@ const Container = styled.div`
     box-sizing: border-box;
   }
 `
-
+const messagePosition = {
+  right: 'left',
+  left: 'right',
+}
 const Message = styled.div`
   position: relative;
+  margin-right:${(props) => props.right
+    ? '.8em'
+    : '0'};
+  margin-${(props) => props.right
+    ? messagePosition.right
+    : messagePosition.left}: auto;
+  text-align: right;
   width: 60%;
   padding: 2em 1em 1em;
   margin-bottom: .5em;
-
-  background: rgba(0, 0, 0, .1);
+  color: #fff;
+  background-color: ${(props) => props.right
+    ? 'royalblue'
+    : 'gray'};
   border-radius: .2em;
 `
 
@@ -76,18 +93,18 @@ const Author = styled.span`
   top: .5em;
   left: 1em;
 
-  font-size: .8em;
+  font-size: .5em;
 `
 
 const Text = styled.p`
   width: 100%;
+  font-size: .8em;
 `
 const Timestamp = styled.span`
   position: absolute;
   top: .5em;
   right: 1em;
 
-  font-size: .8em;
-  color: #39393a;
+  font-size: .5em;
 `
 export default Messages;

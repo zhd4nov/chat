@@ -158,6 +158,7 @@ const App = () => {
         <ChatViewport>
           <Messages
             messages={appState.messages}
+            currentUser={appState.currentUser}
             currentChatId={appState.currentChatId} />
           <SendingForm onSubmit={handleNewMessage} />
         </ChatViewport>

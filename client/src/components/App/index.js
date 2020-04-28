@@ -53,10 +53,15 @@ const App = () => {
   useEffect(() => {
     const updateChats = async () => {
       const chats = await fetchData(resource.chats)();
+      const userChats = chats.filter((chat) => chat.memberIDs.includes(appState.currentUser.id));
+
       setAppState({
         ...appState,
         chats,
-        currentChatId: chats.length > 0 ? chats[0]['id'] : null,
+        currentChatId: userChats.length > 0
+          ? userChats[0]['id']
+          : null, // Sorry i'm in a hurry (:
+        // This code choose a first chat of user chats and activate it
       });
       console.log('Update chats... yeah: ', chats); // CONSOLE (x
     };

@@ -36,9 +36,20 @@ const Container = styled.header`
   color: #fff;
 
   >a {
+    text-decoration: none;
     color: #fff;
     font-variant: small-caps;
-    margin: 0 auto;
+    font-weight: 600;
+    margin-left: auto;
+    transition: all .2s;
+    :hover {
+      transform: rotate(5deg);
+      text-shadow: 0 0 1em rgba(255, 255, 255, 0.1);
+    }
+    :active {
+      position: relative;
+      top: .2em;
+    }
   }
 `
 
@@ -52,16 +63,13 @@ const Avatar = styled.div`
 `
 
 const Name = styled.p`
-  font-size: .8em;
   font-weight: 600;
   font-variant: small-caps;
 `
 
 const Friends = styled.span`
-  margin-left: auto;
-  margin-right: 1.5rem;
+  margin: 0 1.5em;
   font-variant: small-caps;
-  font-size: .8em;
   font-weight: 600;
   cursor: pointer;
   transition: all .2s;
@@ -69,6 +77,10 @@ const Friends = styled.span`
   :hover {
     transform: rotate(5deg);
     text-shadow: 0 0 1em rgba(255, 255, 255, 0.1);
+  }
+  :active {
+    position: relative;
+    top: .2em;
   }
 `
 

@@ -1,6 +1,9 @@
 install:
-	cd server && npm install
+	npm install
 	cd client && npm install
 
 start:
-	cd server && npm run dev
+	npm run dev
+
+datakill:
+	git co -- data/

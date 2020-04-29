@@ -1,1 +1,1 @@
-../../common/events.js
+../../events.js

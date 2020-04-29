@@ -1,1 +1,1 @@
-../../common/consts.js
+../../consts.js

@@ -1,9 +1,6 @@
 install:
-	cd ./server
-	npm install
-	cd ./client
-	npm install
-	cd ..
+	cd server && npm install
+	cd client && npm install
 
 start:
-	cd ./server; npm run dev
+	cd server && npm run dev

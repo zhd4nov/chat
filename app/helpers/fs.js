@@ -3,8 +3,12 @@ import path from 'path';
 
 export function readFile(filename) {
   return new Promise((resolve, reject) => {
+    const _path = process.env.NODE_ENV === 'production'
+      ? path.resolve(__dirname, '..', '..', 'app', 'data', filename)
+      : path.resolve(__dirname, '..', 'data', filename);
+
     fs.readFile(
-      path.resolve(__dirname, '..', 'data', filename),
+      _path,
       'utf8',
       (err, jsonString) => {
         if (err) {
@@ -29,7 +33,9 @@ export function readFile(filename) {
 
 export function updateFile(filename, data) {
   return new Promise((resolve, reject) => {
-    const _path = path.resolve(__dirname, '..', 'data', filename);
+    const _path = process.env.NODE_ENV === 'production'
+      ? path.resolve(__dirname, '..', '..', 'app', 'data', filename)
+      : path.resolve(__dirname, '..', 'data', filename);
 
     fs.writeFile(_path, JSON.stringify({ data }), 'utf8', err => {
       if (err) {

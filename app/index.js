@@ -1,9 +1,11 @@
+import "regenerator-runtime/runtime.js";
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import socket from 'socket.io';
 import morgan from 'morgan';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
+import path from 'path';
 
 import events from './events';
 
@@ -17,7 +19,7 @@ import messageRouter from './components/Message/messageRouter';
 import Message from './components/Message/Message';
 
 dotenv.config();
-const port = process.env.SOCKET_PORT || 5000;
+const port = process.env.PORT || 8080;
 const app = express();
 const logger = morgan('dev');
 
@@ -31,6 +33,14 @@ app.use('/users', userRouter);
 app.use('/chats', chatRouter);
 app.use('/messages', messageRouter);
 
+if (process.env.NODE_ENV === 'production') {
+  // Serve any static files
+  app.use(express.static(path.join(__dirname, '..', 'client/dist')));
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'client/dist', 'index.html'));
+  });
+}
 
 // run server
 const server = app.listen(port, () => {

@@ -8,6 +8,7 @@
     "build": "webpack --mode production --progress",
     "start": "serve -s dist -l 4000"
   },
+  "proxy": "http://localhost:8080",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -31,6 +32,7 @@
     "react": "^16.13.1",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^16.13.1",
+    "rimraf": "^3.0.2",
     "socket.io-client": "^2.3.0",
     "styled-components": "^5.1.0"
   }

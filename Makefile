@@ -6,4 +6,4 @@ start:
 	npm run dev
 
 datakill:
-	git co -- data/
+	git co -- app/data/

@@ -1,1 +1,1 @@
-../../consts.js
+../../app/consts.js

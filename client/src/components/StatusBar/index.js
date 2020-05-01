@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import consts from '../../consts';
 
+import OnlineUsers from '../OnlineUsers';
+
 const StatusBar = ({ currentUser, currentChatId }) => {
   const { name } = currentUser;
   const inviteLink = `${consts.SOCKET_URL}/users/invite/${currentChatId}`;
@@ -21,7 +23,7 @@ const StatusBar = ({ currentUser, currentChatId }) => {
       {/* Status Bar has font-variant: small-caps. Format text to lower case. */}
       <Name>{name.toLowerCase()}</Name>
       <a href={inviteLink} onClick={handleCopyLink}>copy invite link</a>
-      <Friends>who's online in this chat</Friends>
+      <OnlineUsers />
     </Container>
   );
 };
@@ -29,6 +31,7 @@ const StatusBar = ({ currentUser, currentChatId }) => {
 const Container = styled.header`
   width: 100%;
   height: 10vh;
+  position: relative;
 
   display: flex;
   align-items: center;

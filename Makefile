@@ -2,7 +2,7 @@ install:
 	npm install
 	cd client && npm install
 
-start.dev:
+develop:
 	npm run dev
 
 deploy:

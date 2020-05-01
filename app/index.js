@@ -150,7 +150,7 @@ io.on('connection', (socket) => {
   // RESET stores
   socket.on('disconnect', async () => {
     // Remove all track where the current user is host
-    await removeUserChats(currentUser.getUserID());
+    await removeUserMarks(currentUser.getUserID());
     // Remove user when socket is dead
     currentUser.remove();
     console.log('User disconnected', currentUser); // CONSOLE (x)
@@ -158,9 +158,14 @@ io.on('connection', (socket) => {
 });
 
 // Tools (?)
-const removeUserChats = async (userID) => {
+const removeUserMarks = async (userID) => {
+  // Remove current user chats
   const chats = await Chat.getAllChats();
   const restChats = chats.filter((chat) => chat.hostUserID !== userID);
-
   Chat.updateChats(restChats);
+
+  // Remove current user messages
+  const messages = await Message.getAllMessages();
+  const restMessages = messages.filter((message) => message.authorId !== userID);
+  Message.updateMessages(restMessages);
 };

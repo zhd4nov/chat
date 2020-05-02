@@ -2,11 +2,19 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import consts from '../../consts';
 
-import OnlineUsers from '../OnlineUsers';
+import OnlineUsersList from '../OnlineUsers';
+import Users from '../../assets/online-users.svg';
+import Video from '../../assets/video.svg';
 
 const StatusBar = ({ currentUser, currentChatId }) => {
   const { name } = currentUser;
   const inviteLink = `${consts.SOCKET_URL}/users/invite/${currentChatId}`;
+
+  const [showUsers, setShowUsers] = useState(false);
+
+  const handleShowUsers = (e) => {
+    setShowUsers(!showUsers);
+  };
 
   const handleCopyLink = (e) => {
     e.preventDefault();
@@ -23,7 +31,9 @@ const StatusBar = ({ currentUser, currentChatId }) => {
       {/* Status Bar has font-variant: small-caps. Format text to lower case. */}
       <Name>{name.toLowerCase()}</Name>
       <a href={inviteLink} onClick={handleCopyLink}>copy invite link</a>
-      <OnlineUsers />
+      <StyledVideo />
+      <StyledUsers onClick={handleShowUsers} />
+      {showUsers && <OnlineUsersList />}
     </Container>
   );
 };
@@ -44,6 +54,7 @@ const Container = styled.header`
     font-variant: small-caps;
     font-weight: 600;
     margin-left: auto;
+    margin-right: 1.5em;
     transition: all .2s;
     :hover {
       transform: rotate(5deg);
@@ -54,7 +65,7 @@ const Container = styled.header`
       top: .2em;
     }
   }
-`
+`;
 
 const Avatar = styled.div`
   width: 7vh;
@@ -63,19 +74,23 @@ const Avatar = styled.div`
   margin: 0 1em 0 1.5em;
 
   background: #fff;
-`
+`;
 
 const Name = styled.p`
   font-weight: 600;
   font-variant: small-caps;
-`
+`;
 
-const Friends = styled.span`
-  margin: 0 1.5em;
-  font-variant: small-caps;
-  font-weight: 600;
-  cursor: wait;
-  color: gray;  
-`
+const StyledUsers = styled(Users)`
+  margin-right: 1.5em;
+  cursor: pointer;
+
+  :hover {
+    text-shadow: 0 0 10px #fff;
+  }
+`;
+const StyledVideo = styled(Video)`
+  margin-right: 1.5em;
+`;
 
 export default StatusBar;

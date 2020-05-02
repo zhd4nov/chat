@@ -45,9 +45,8 @@ const OnlineUsers = ({ className }) => {
 
 const styledOnlineUsers = styled(OnlineUsers)`
   position: absolute;
-  top: 0;
+  top: 10vh;
   right: 0;
-  padding-top: 10vh;
 `;
 
 export default styledOnlineUsers;

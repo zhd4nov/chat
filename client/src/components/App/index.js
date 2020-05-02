@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import io from 'socket.io-client';
 import cookie from 'js-cookie';
 import axios from 'axios';
@@ -6,6 +7,9 @@ import styled from 'styled-components';
 
 import events from '../../events';
 import consts from '../../consts';
+
+// Get redux actions
+import * as actions from '../../actions';
 
 import Messages from '../Messages';
 import SendingForm from '../SendingForm';
@@ -40,7 +44,20 @@ const resource = {
   users: 'users',
 };
 
-const App = () => {
+// Get app state from redux store
+const mapStateToProps = (state) => {
+  const props = {
+    users: state.users,
+  };
+
+  return props;
+};
+// Create actions to change state
+const actionCreators = {
+  updateUserList: actions.updateUserList
+}
+
+const App = (props) => { // Props include state and actions
   // Init appState - single source of truth
   const [appState, setAppState] = useState({
     users: [], // Actual a user list
@@ -63,7 +80,6 @@ const App = () => {
           : null, // Sorry i'm in a hurry (:
         // This code choose a first chat of user chats and activate it
       });
-      console.log('Update chats... yeah: ', chats); // CONSOLE (x
     };
 
     const updateMessages = async () => {
@@ -72,16 +88,21 @@ const App = () => {
         ...appState,
         messages,
       });
-      console.log('Update messages... yeah'); // CONSOLE (x)
     };
 
-    const updateUsers = (user) => {
+    const updateUsers = async (user) => {
       // handle response from server in IntroModal (i)
       setAppState({
         ...appState,
         users: [...appState.users, user],
       });
-      console.log('Update users... yeah\n', user); // CONSOLE (x
+
+      // #move-to-redux
+      // Get data from server
+      const users = await fetchData(resource.users)();
+      // Update users in store
+      const { updateUserList } = props; // Get the right action
+      updateUserList({ users }); // Dispatch... Boom!
     };
 
     const updateCurrentUser = (user) => {
@@ -208,4 +229,4 @@ const ChatViewport = styled.div`
   padding: 0 3em;
 `
 
-export default App;
+export default connect(mapStateToProps, actionCreators)(App);

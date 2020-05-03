@@ -1,9 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import * as actions from '../../actions';
 import styled from 'styled-components';
 
-import events from '../../events';
+// TODO: Replece current user defenition from app component
+// Get state from redux store
+const mapStateToProps = (state) => {
+  const props = {
+    users: state.users,
+    currentUser: state.currentUser,
+  };
 
-const IntroModal = ({ createNewUser }) => {
+  return props;
+};
+
+// Create redux actions
+const actionCreators = {
+  setCurrentUsers: actions.setCurrentUser,
+};
+
+const IntroModal = (props) => {
+  // Unzip props
+  const { createNewUser, users } = props;
 
   const [name, setName] = useState('');
   const [UIState, setUIState] = useState({
@@ -127,4 +145,4 @@ const Button = styled.button`
   }
 `
 
-export default IntroModal;
+export default connect(mapStateToProps, actionCreators)(IntroModal);

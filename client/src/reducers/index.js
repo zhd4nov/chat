@@ -59,7 +59,12 @@ const currentUser = handleActions(
   defaultStateForCurrent,
 );
 
-const currentChat = handleActions({}, defaultStateForCurrent);
+const currentChat = handleActions(
+  {
+    [actions.setCurrentChat]: (state, { payload: { chatId } }) => chatId,
+  },
+  defaultStateForCurrent,
+);
 
 const UIState = handleActions({}, defaultUIState);
 

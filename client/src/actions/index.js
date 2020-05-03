@@ -71,6 +71,9 @@ const updateMessages = () => async (dispatch) => {
 // User action
 const setCurrentUser = createAction('USER_SET_CURRENT');
 
+// Chat action
+const setCurrentChat = createAction('CHAT_SET_CURRENT');
+
 // Wait for refactor (x)
 export {
   // Users
@@ -84,6 +87,7 @@ export {
   updateChatsRequest,
   updateChatsSuccess,
   updateChatsFailure,
+  setCurrentChat,
   // Messages
   updateMessages,
   updateMessagesRequest,

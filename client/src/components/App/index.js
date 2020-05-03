@@ -25,7 +25,7 @@ const mapStateToProps = (state) => {
     chats: state.chats,
     messages: state.messages,
     currentUser: state.currentUser,
-    // TODO: NEED to Current User definition
+    currentChat: state.currentChat,
   };
 
   return props;
@@ -36,11 +36,12 @@ const actionCreators = {
   updateChats: actions.updateChats,
   updateMessages: actions.updateMessages,
   setCurrentUser: actions.setCurrentUser,
-}
+  setCurrentChat: actions.setCurrentChat,
+};
 
 const App = (props) => { // Props include state and actions
   // Get app state from props
-  const { users, chats, messages, currentUser } = props;
+  const { chats, messages, currentUser, currentChat } = props;
 
   useEffect(() => {
     // Get actual state from server
@@ -111,31 +112,34 @@ const App = (props) => { // Props include state and actions
     socket.emit(events.ADD_USER_FROM_CLIENT, userInfo);
   };
 
-  const handleCurrentChat = (id) => () => setAppState({ ...appState, currentChatId: id });
+  const handleCurrentChat = (id) => () => {
+    const { setCurrentChat } = props;
+    setCurrentChat({ chatId: id });
+  };
 
   const handleNewMessage = (messageText) => {
     socket.emit(
       events.ADD_MESSAGE_FROM_CLIENT,
-      { newMessage: messageText, chatId: appState.currentChatId },
+      { newMessage: messageText, chatId: currentChat },
     );
-  }
+  };
 
   // TODO: Resolve current chat problem
   const app = (
     <Fragment>
-      <StatusBar currentUser={currentUser} currentChatId={null} />
+      <StatusBar currentUser={currentUser} currentChatId={currentChat} />
       <Workspace>
         <Channels
           chats={chats.allIds.map((chatId) => chats.byIds[chatId])}
           socket={socket}
           currentUser={currentUser}
-          currentChatId={null}
+          currentChatId={currentChat}
           handleCurrentChat={handleCurrentChat} />
         <ChatViewport>
           <Messages
             messages={messages.allIds.map((msgId) => messages.byIds[msgId])}
             currentUser={currentUser}
-            currentChatId={null} />
+            currentChatId={currentChat} />
           <SendingForm onSubmit={handleNewMessage} />
         </ChatViewport>
       </Workspace>

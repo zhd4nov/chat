@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-const SendingForm = ({ onSubmit }) => {
+import events from '../../events';
+
+const mapStateToProps = (state) => {
+  const props = {
+    currentChat: state.currentChat,
+  };
+
+  return props;
+};
+
+const SendingForm = (props) => {
+  const { socket, currentChat } = props;
+  // Move to redux store:
   const [message, setMessage] = useState('');
 
   const handleInput = (e) => {
@@ -9,24 +22,29 @@ const SendingForm = ({ onSubmit }) => {
     setMessage(e.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(message);
-    setMessage('');
-  }
-
-  const handleEnterSend = (e) => {
+  const handleSendByEnter = (e) => {
     if (e.keyCode === 13 && e.shiftKey === false) {
-      handleSubmit(e);
+      handleMessageSending(e);
     }
   };
 
+  const handleMessageSending = (e) => {
+    e.preventDefault();
+    // Send an event to server 
+    socket.emit(
+      events.ADD_MESSAGE_FROM_CLIENT,
+      { newMessage: message, chatId: currentChat },
+    );
+
+    setMessage(''); // Reset message text
+  }
+
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleMessageSending}>
       <Message
         placeholder="Write a massage..."
         onChange={handleInput}
-        onKeyDown={handleEnterSend}
+        onKeyDown={handleSendByEnter}
         value={message} />
       <SendButton>Send</SendButton>
     </Form>
@@ -67,4 +85,4 @@ const SendButton = styled.button`
   }
 `
 
-export default SendingForm;
+export default connect(mapStateToProps)(SendingForm);

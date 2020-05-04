@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../../actions';
+import cookie from 'js-cookie';
 import styled from 'styled-components';
+
+import * as actions from '../../actions';
+import events from '../../events';
 
 // TODO: Replece current user defenition from app component
 // Get state from redux store
@@ -21,12 +24,24 @@ const actionCreators = {
 
 const IntroModal = (props) => {
   // Unzip props
-  const { createNewUser, users } = props;
+  const { socket } = props;
 
   const [name, setName] = useState('');
   const [UIState, setUIState] = useState({
     currentInputState: 'normal',
   });
+
+
+  const createNewUser = (name) => {
+    // Get user invite
+    const chatId = cookie.get('invite');
+    // And return Boolean
+    const hasInvite = !!chatId;
+    // Create user data
+    const userInfo = { hasInvite, chatId, name };
+    // Send user data
+    socket.emit(events.ADD_USER_FROM_CLIENT, userInfo);
+  };
 
   const handleInput = (e) => {
     e.preventDefault();

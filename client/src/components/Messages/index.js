@@ -1,10 +1,22 @@
 import React, { useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { Scrollbars } from 'react-custom-scrollbars';
 
+const mapStateToProps = (state) => {
+  const props = {
+    messages: state.messages,
+    currentChat: state.currentChat,
+    currentUser: state.currentUser,
+  };
 
+  return props;
+};
 
-const Messages = ({ messages, currentChatId, currentUser }) => {
+const Messages = (props) => {
+  const { messages, currentChat, currentUser } = props;
+  const preparedMessages = messages.allIds.map((msgId) => messages.byIds[msgId]);
+
   const messagesEnd = useRef(null);
 
   const scrollToBottom = () => {
@@ -19,15 +31,15 @@ const Messages = ({ messages, currentChatId, currentUser }) => {
   });
 
   return (
-    <Container currentChatId >
+    <Container currentChat >
       <Scrollbars
         style={{ height: '480px', width: '100%' }}
         renderView={props => (
           <div {...props} style={{ ...props.style, overflowX: 'hidden', paddingTop: '1em' }} />
         )}>
         {
-          messages
-            .filter((message) => message.chatId === currentChatId)
+          preparedMessages
+            .filter((message) => message.chatId === currentChat)
             .map((message) => {
               const {
                 authorId,
@@ -107,4 +119,4 @@ const Timestamp = styled.span`
 
   font-size: .5em;
 `
-export default Messages;
+export default connect(mapStateToProps)(Messages);

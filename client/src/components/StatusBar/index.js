@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import consts from '../../consts';
 
@@ -6,10 +7,21 @@ import OnlineUsersList from '../OnlineUsers';
 import Users from '../../assets/online-users.svg';
 import Video from '../../assets/video.svg';
 
-const StatusBar = ({ currentUser, currentChatId }) => {
-  const { name } = currentUser;
-  const inviteLink = `${consts.SOCKET_URL}/users/invite/${currentChatId}`;
+const mapStateToProps = (state) => {
+  const props = {
+    currentUser: state.currentUser,
+    currentChat: state.currentChat,
+  };
 
+  return props;
+};
+
+const StatusBar = (props) => {
+  const { currentUser, currentChat } = props;
+
+  const inviteLink = `${consts.SOCKET_URL}/users/invite/${currentChat}`;
+
+  // TODO: Move to redux store:
   const [showUsers, setShowUsers] = useState(false);
 
   const handleShowUsers = (e) => {
@@ -19,9 +31,9 @@ const StatusBar = ({ currentUser, currentChatId }) => {
   const handleCopyLink = (e) => {
     e.preventDefault();
     navigator.clipboard.writeText(e.target.getAttribute('href')).then(() => {
-      console.log('success');
+      console.log('cp success');
     }, () => {
-      console.log('fail');
+      console.log('cp fail');
     });
   }
 
@@ -29,7 +41,7 @@ const StatusBar = ({ currentUser, currentChatId }) => {
     <Container>
       <Avatar />
       {/* Status Bar has font-variant: small-caps. Format text to lower case. */}
-      <Name>{name.toLowerCase()}</Name>
+      <Name>{currentUser.name.toLowerCase()}</Name>
       <a href={inviteLink} onClick={handleCopyLink}>copy invite link</a>
       <StyledVideo />
       <StyledUsers onClick={handleShowUsers} />
@@ -93,4 +105,4 @@ const StyledVideo = styled(Video)`
   margin-right: 1.5em;
 `;
 
-export default StatusBar;
+export default connect(mapStateToProps)(StatusBar);

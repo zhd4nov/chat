@@ -1,30 +1,23 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import faker from 'faker';
 import styled from 'styled-components';
 
 import events from '../../events';
 
-import * as actions from '../../actions';
-
 import Chat from '../Chat';
 
 const mapStateToProps = (state) => {
   const props = {
     chats: state.chats,
-    currentChat: state.currentChat,
     currentUser: state.currentUser,
   };
 
   return props;
 };
 
-const actionCreators = {
-  setCurrentChat: actions.setCurrentChat,
-};
-
 const Channels = (props) => {
-  const { currentChat, currentUser, chats, socket } = props;
+  const { currentUser, chats, socket } = props;
 
   const preparedChats = chats.allIds.map((id) => chats.byIds[id]);
 
@@ -36,21 +29,6 @@ const Channels = (props) => {
     socket.emit(events.ADD_CHAT_FROM_CLIENT, chatName);
   };
 
-  const handleRemoveChat = (chat, currentUserId) => (e) => {
-    e.preventDefault();
-    // Only hostUser can do it (!) check...
-    if (chat.hostUserID === currentUserId) {
-      socket.emit(events.DELETE_CHAT_FROM_CLIENT, chat.id)
-    } else {
-      // TODO: set behavior if forbiden
-    }
-  }
-
-  const handleCurrentChat = (id) => () => {
-    const { setCurrentChat } = props;
-    setCurrentChat({ chatId: id });
-  };
-
   return (
     <Container>
       {
@@ -59,10 +37,7 @@ const Channels = (props) => {
           .map((chat) => (
             <Chat
               chat={chat}
-              currentChatId={currentChat}
-              // next function uses closure and return handler
-              handleCurrentChat={handleCurrentChat}
-              handleRemoveChat={handleRemoveChat(chat, currentUser.id)}
+              socket={socket}
               key={chat.id} />
           ))
       }
@@ -107,4 +82,4 @@ const Button = styled.button`
   }
 `
 
-export default connect(mapStateToProps, actionCreators)(Channels);
+export default connect(mapStateToProps)(Channels);

@@ -1,23 +1,55 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-// TODO: Rename chat (in future)
-const Chat = ({ chat, currentChatId, handleCurrentChat, handleRemoveChat }) => {
-  const { name } = chat;
+import events from '../../events';
+import * as actions from '../../actions';
 
-  const isCurrentChat = () => chat.id === currentChatId;
+const mapStateToProps = (state) => {
+  const props = {
+    currentChat: state.currentChat,
+    currentUser: state.currentUser,
+  };
+
+  return props;
+};
+
+const actionCreators = {
+  setCurrentChat: actions.setCurrentChat,
+};
+
+// TODO: Rename chat, Invite link right into card
+const Chat = (props) => {
+  const { chat, currentChat, currentUser, socket } = props;
+
+  const isCurrentChat = () => chat.id === currentChat;
+
+  const handleRemoveChat = (chat) => (e) => {
+    e.preventDefault();
+    // Only hostUser can do it (!) check...
+    if (chat.hostUserID === currentUser.id) {
+      socket.emit(events.DELETE_CHAT_FROM_CLIENT, chat.id)
+    } else {
+      // TODO: set behavior if forbiden
+    }
+  };
+
+  const handleCurrentChat = (id) => () => {
+    const { setCurrentChat } = props;
+    setCurrentChat({ chatId: id });
+  };
 
   // Define component option:
   const activeChat = (
     <CurrentChatContainer>
-      <Title active>{name}</Title>
-      <CloseCross onClick={handleRemoveChat} >&#10006;</CloseCross>
+      <Title active>{chat.name}</Title>
+      <CloseCross onClick={handleRemoveChat(chat)} >&#10006;</CloseCross>
     </CurrentChatContainer>
   );
 
   const inactiveChat = (
     <Container onClick={handleCurrentChat(chat.id)}>
-      <Title >{name}</Title>
+      <Title >{chat.name}</Title>
     </Container>
   );
   // render component with the right style
@@ -77,4 +109,4 @@ const CloseCross = styled.button`
   }
 `
 
-export default Chat;
+export default connect(mapStateToProps, actionCreators)(Chat);

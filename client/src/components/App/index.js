@@ -1,7 +1,6 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
-import cookie from 'js-cookie';
 import styled from 'styled-components';
 
 import events from '../../events';
@@ -21,11 +20,7 @@ const socket = io.connect(consts.SOCKET_URL);
 // Get app state from redux store
 const mapStateToProps = (state) => {
   const props = {
-    users: state.users,
-    chats: state.chats,
-    messages: state.messages,
     currentUser: state.currentUser,
-    currentChat: state.currentChat,
   };
 
   return props;
@@ -41,7 +36,7 @@ const actionCreators = {
 
 const App = (props) => { // Props include state and actions
   // Get app state from props
-  const { chats, messages, currentUser, currentChat } = props;
+  const { currentUser } = props;
 
   useEffect(() => {
     // Get actual state from server
@@ -97,40 +92,14 @@ const App = (props) => { // Props include state and actions
     }
   })
 
-  const createNewUser = (name) => {
-    // Get user invite
-    const chatId = cookie.get('invite');
-    // And return Boolean
-    const hasInvite = !!chatId;
-    // Create user data
-    const userInfo = {
-      hasInvite,
-      chatId,
-      name,
-    }
-    // Send user data
-    socket.emit(events.ADD_USER_FROM_CLIENT, userInfo);
-  };
-
-  const handleNewMessage = (messageText) => {
-    socket.emit(
-      events.ADD_MESSAGE_FROM_CLIENT,
-      { newMessage: messageText, chatId: currentChat },
-    );
-  };
-
-  // TODO: Resolve current chat problem
   const app = (
     <Fragment>
-      <StatusBar currentUser={currentUser} currentChatId={currentChat} />
+      <StatusBar />
       <Workspace>
         <Channels socket={socket} />
         <ChatViewport>
-          <Messages
-            messages={messages.allIds.map((msgId) => messages.byIds[msgId])}
-            currentUser={currentUser}
-            currentChatId={currentChat} />
-          <SendingForm onSubmit={handleNewMessage} />
+          <Messages />
+          <SendingForm socket={socket} />
         </ChatViewport>
       </Workspace>
     </Fragment>
@@ -141,7 +110,7 @@ const App = (props) => { // Props include state and actions
       { // First, ask user name
         currentUser.name
           ? app // if user name is exist return our app
-          : <IntroModal createNewUser={createNewUser} />
+          : <IntroModal socket={socket} />
       }
     </AppContainer>
   );

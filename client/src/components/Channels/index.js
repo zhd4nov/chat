@@ -1,13 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import faker from 'faker';
 import styled from 'styled-components';
 
 import events from '../../events';
 
+import * as actions from '../../actions';
+
 import Chat from '../Chat';
 
+const mapStateToProps = (state) => {
+  const props = {
+    chats: state.chats,
+    currentChat: state.currentChat,
+    currentUser: state.currentUser,
+  };
+
+  return props;
+};
+
+const actionCreators = {
+  setCurrentChat: actions.setCurrentChat,
+};
+
 const Channels = (props) => {
-  const { handleCurrentChat, currentChatId, currentUser, socket, chats } = props;
+  const { currentChat, currentUser, chats, socket } = props;
+
+  const preparedChats = chats.allIds.map((id) => chats.byIds[id]);
 
   const handleAddNewChat = (e) => {
     // Simplify naming with faker.js
@@ -27,15 +46,20 @@ const Channels = (props) => {
     }
   }
 
+  const handleCurrentChat = (id) => () => {
+    const { setCurrentChat } = props;
+    setCurrentChat({ chatId: id });
+  };
+
   return (
     <Container>
       {
-        chats
+        preparedChats
           .filter(({ memberIDs }) => memberIDs.includes(currentUser.id))
           .map((chat) => (
             <Chat
               chat={chat}
-              currentChatId={currentChatId}
+              currentChatId={currentChat}
               // next function uses closure and return handler
               handleCurrentChat={handleCurrentChat}
               handleRemoveChat={handleRemoveChat(chat, currentUser.id)}
@@ -83,4 +107,4 @@ const Button = styled.button`
   }
 `
 
-export default Channels;
+export default connect(mapStateToProps, actionCreators)(Channels);

@@ -112,11 +112,6 @@ const App = (props) => { // Props include state and actions
     socket.emit(events.ADD_USER_FROM_CLIENT, userInfo);
   };
 
-  const handleCurrentChat = (id) => () => {
-    const { setCurrentChat } = props;
-    setCurrentChat({ chatId: id });
-  };
-
   const handleNewMessage = (messageText) => {
     socket.emit(
       events.ADD_MESSAGE_FROM_CLIENT,
@@ -129,12 +124,7 @@ const App = (props) => { // Props include state and actions
     <Fragment>
       <StatusBar currentUser={currentUser} currentChatId={currentChat} />
       <Workspace>
-        <Channels
-          chats={chats.allIds.map((chatId) => chats.byIds[chatId])}
-          socket={socket}
-          currentUser={currentUser}
-          currentChatId={currentChat}
-          handleCurrentChat={handleCurrentChat} />
+        <Channels socket={socket} />
         <ChatViewport>
           <Messages
             messages={messages.allIds.map((msgId) => messages.byIds[msgId])}

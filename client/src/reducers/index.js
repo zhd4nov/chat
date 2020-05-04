@@ -61,7 +61,12 @@ const currentUser = handleActions(
 
 const currentChat = handleActions(
   {
-    [actions.setCurrentChat]: (state, { payload: { chatId } }) => chatId,
+    [actions.updateChatsSuccess]: (state, { payload: { chats } }) => {
+      return chats[chats.length - 1].id;
+    },
+    [actions.setCurrentChat]: (state, { payload: { chatId } }) => {
+      return chatId;
+    },
   },
   defaultStateForCurrent,
 );

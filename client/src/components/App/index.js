@@ -78,6 +78,8 @@ const App = (props) => { // Props include state and actions
     socket.on(events.ADD_FRIEND_FROM_SERVER, fetchMessages);
     socket.on(events.ADD_FRIEND_FROM_SERVER, fetchChats);
 
+    socket.on(events.USER_LEAVE_FROM_SERVER, fetchChats);
+
     return () => {
       socket.off(events.ADD_CHAT_FROM_SERVER, fetchChats);
       socket.off(events.DELETE_CHAT_FROM_SERVER, fetchMessages);
@@ -89,6 +91,8 @@ const App = (props) => { // Props include state and actions
       socket.off(events.ADD_FRIEND_FROM_SERVER, fetchUsers);
       socket.off(events.ADD_FRIEND_FROM_SERVER, fetchMessages);
       socket.off(events.ADD_FRIEND_FROM_SERVER, fetchChats);
+
+      socket.off(events.USER_LEAVE_FROM_SERVER, fetchChats);
     }
   })
 

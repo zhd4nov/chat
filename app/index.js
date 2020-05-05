@@ -153,16 +153,29 @@ io.on('connection', (socket) => {
     await removeUserMarks(currentUser.getUserID());
     // Remove user when socket is dead
     currentUser.remove();
+    // Send event to client, user leave
+    socket.broadcast.emit(events.USER_LEAVE_FROM_SERVER, currentUser);
     console.log('User disconnected', currentUser); // CONSOLE (x)
   });
 });
 
 // Tools (?)
 const removeUserMarks = async (userID) => {
-  // Remove current user chats
+  // Remove current user chats and membership
   const chats = await Chat.getAllChats();
   const restChats = chats.filter((chat) => chat.hostUserID !== userID);
-  Chat.updateChats(restChats);
+  const chatsWithoutCurrentUserAsMember = restChats.map((chat) => {
+    const { memberIDs } = chat;
+    if (memberIDs.includes(userID)) {
+      const cleanedMembers = memberIDs.filter((id) => id !== userID);
+      chat.memberIDs = cleanedMembers;
+
+      return chat;
+    }
+
+    return chat;
+  })
+  Chat.updateChats(chatsWithoutCurrentUserAsMember);
 
   // Remove current user messages
   const messages = await Message.getAllMessages();

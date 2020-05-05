@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { Scrollbars } from 'react-custom-scrollbars';
 
+import Message from '../Message';
+
 const mapStateToProps = (state) => {
   const props = {
     messages: state.messages,
@@ -40,22 +42,7 @@ const Messages = (props) => {
         {
           preparedMessages
             .filter((message) => message.chatId === currentChat)
-            .map((message) => {
-              const {
-                authorId,
-                authorName,
-                id: messageId,
-                text,
-                time } = message;
-
-              return (
-                <Message right={authorId === currentUser.id} key={messageId} >
-                  <Author>{authorName}</Author>
-                  <Text>{text}</Text>
-                  <Timestamp>{time}</Timestamp>
-                </Message>
-              );
-            })
+            .map((message) => <Message message={message} key={message.id} />)
         }
         <div ref={messagesEnd} />
       </Scrollbars>
@@ -76,47 +63,6 @@ const Container = styled.div`
     overflow: hidden;
     box-sizing: border-box;
   }
-`
-const messagePosition = {
-  right: 'left',
-  left: 'right',
-}
-const Message = styled.div`
-  position: relative;
-  margin-right:${(props) => props.right
-    ? '.8em'
-    : '0'};
-  margin-${(props) => props.right
-    ? messagePosition.right
-    : messagePosition.left}: auto;
-  text-align: right;
-  width: 60%;
-  padding: 2em 1em 1em;
-  margin-bottom: .5em;
-  color: #fff;
-  background-color: ${(props) => props.right
-    ? 'royalblue'
-    : 'gray'};
-  border-radius: .2em;
-`
+`;
 
-const Author = styled.span`
-  position: absolute;
-  top: .5em;
-  left: 1em;
-
-  font-size: .5em;
-`
-
-const Text = styled.p`
-  width: 100%;
-  font-size: .8em;
-`
-const Timestamp = styled.span`
-  position: absolute;
-  top: .5em;
-  right: 1em;
-
-  font-size: .5em;
-`
 export default connect(mapStateToProps)(Messages);

@@ -64,6 +64,7 @@ const OnlineUsers = (props) => {
 
 const styledOnlineUsers = styled(OnlineUsers)`
   position: absolute;
+  z-index: 100;
   top: 10vh;
   right: 0;
 `;

@@ -1,10 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-const User = ({ className }) => {
+const User = (props) => {
+  const { className, user } = props;
+
   return (
     <div className={className}>
-      <p className="name">Mister User</p>
+      <p className="name">{user.name}</p>
       <div className="avatar"></div>
     </div>
   );
@@ -13,11 +16,12 @@ const User = ({ className }) => {
 const StyledUser = styled(User)`
   width: 100%;
   display: flex;
+  justify-content: flex-end;
   align-items: center;
   margin-top: .5em;
-  margin-right: 1.5em;
+  padding-right: 1.5em;
 
-  div.avatar {
+  .avatar {
     width: 2em;
     height: 2em;
     border-radius: 50%;
@@ -31,14 +35,29 @@ const StyledUser = styled(User)`
   }
 `;
 
+const mapStateToProps = (state) => {
+  const props = {
+    users: state.users,
+    chats: state.chats,
+    currentChat: state.currentChat,
+  };
 
-const OnlineUsers = ({ className }) => {
+  return props;
+};
+
+const OnlineUsers = (props) => {
+  // Unzip props
+  const { className, users, chats, currentChat } = props;
+  // Get users from current chat
+  // TODO: clean members when user disconnect (!)
+  const { memberIDs } = chats.byIds[currentChat];
+  const currentUsers = memberIDs.map((userId) => users.byIds[userId]);
+
   return (
     <div className={className}>
-      <StyledUser />
-      <StyledUser />
-      <StyledUser />
-      <StyledUser />
+      {
+        currentUsers.map((user) => <StyledUser user={user} key={user.id} />)
+      }
     </div>
   );
 };
@@ -49,4 +68,4 @@ const styledOnlineUsers = styled(OnlineUsers)`
   right: 0;
 `;
 
-export default styledOnlineUsers;
+export default connect(mapStateToProps)(styledOnlineUsers);

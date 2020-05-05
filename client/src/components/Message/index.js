@@ -26,6 +26,7 @@ const Message = ({ message, currentUser }) => {
   );
 };
 
+// Detect side of auto margin
 const messagePosition = {
   right: 'left',
   left: 'right',
@@ -39,15 +40,18 @@ const Container = styled.div`
   margin-${(props) => props.right
     ? messagePosition.right
     : messagePosition.left}: auto;
-  text-align: right;
+  text-align: ${(props) => props.right
+    ? 'right'
+    : 'left'};
   width: 60%;
   padding: 2em 1em 1em;
   margin-bottom: .5em;
   color: #fff;
   background-color: ${(props) => props.right
     ? 'royalblue'
-    : 'gray'};
+    : '#bababa'};
   border-radius: .2em;
+  word-break: break-all;
 `;
 
 const Author = styled.span`

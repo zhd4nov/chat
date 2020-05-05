@@ -3,17 +3,25 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import consts from '../../consts';
 
-import OnlineUsersList from '../OnlineUsers';
+import * as actions from '../../actions';
+
 import Users from '../../assets/online-users.svg';
 import Video from '../../assets/video.svg';
+
+import OnlineUsersList from '../OnlineUsers';
 
 const mapStateToProps = (state) => {
   const props = {
     currentUser: state.currentUser,
     currentChat: state.currentChat,
+    conversationMode: state.conversationMode,
   };
 
   return props;
+};
+
+const actionCreators = {
+  setConversationMode: actions.setConversationMode,
 };
 
 const StatusBar = (props) => {
@@ -26,6 +34,11 @@ const StatusBar = (props) => {
 
   const handleShowUsers = (e) => {
     setShowUsers(!showUsers);
+  };
+
+  const handleVideoCall = () => {
+    const { conversationMode, setConversationMode } = props;
+    setConversationMode({ mode: 'video' });
   };
 
   const handleCopyLink = (e) => {
@@ -43,7 +56,7 @@ const StatusBar = (props) => {
       {/* Status Bar has font-variant: small-caps. Format text to lower case. */}
       <Name>{currentUser.name.toLowerCase()}</Name>
       <a href={inviteLink} onClick={handleCopyLink}>copy invite link</a>
-      <StyledVideo />
+      <StyledVideo onClick={handleVideoCall} />
       <StyledUsers onClick={handleShowUsers} />
       {showUsers && <OnlineUsersList />}
     </Container>
@@ -105,4 +118,4 @@ const StyledVideo = styled(Video)`
   margin-right: 1.5em;
 `;
 
-export default connect(mapStateToProps)(StatusBar);
+export default connect(mapStateToProps, actionCreators)(StatusBar);

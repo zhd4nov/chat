@@ -14,6 +14,7 @@ import SendingForm from '../SendingForm';
 import Channels from '../Channels';
 import StatusBar from '../StatusBar';
 import IntroModal from '../IntroModal';
+import VideoCall from '../VideoCall';
 
 const socket = io.connect(consts.SOCKET_URL);
 
@@ -21,6 +22,7 @@ const socket = io.connect(consts.SOCKET_URL);
 const mapStateToProps = (state) => {
   const props = {
     currentUser: state.currentUser,
+    conversationMode: state.conversationMode,
   };
 
   return props;
@@ -36,7 +38,7 @@ const actionCreators = {
 
 const App = (props) => { // Props include state and actions
   // Get app state from props
-  const { currentUser } = props;
+  const { currentUser, conversationMode } = props;
 
   useEffect(() => {
     // Get actual state from server
@@ -105,6 +107,7 @@ const App = (props) => { // Props include state and actions
           <Messages />
           <SendingForm socket={socket} />
         </ChatViewport>
+        {conversationMode === 'video' && <VideoCall />}
       </Workspace>
     </Fragment>
   );
@@ -140,7 +143,7 @@ const Workspace = styled.main`
   flex-flow: row nowrap;
   border-left: 1px solid #bababa;
   border-right: 1px solid #bababa;
-`
+`;
 
 const ChatViewport = styled.div`
   width: 70vw;
@@ -149,6 +152,6 @@ const ChatViewport = styled.div`
   display: flex;
   flex-flow: column nowrap;
   padding: 0 3em;
-`
+`;
 
 export default connect(mapStateToProps, actionCreators)(App);

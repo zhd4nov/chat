@@ -6,6 +6,7 @@ import * as actions from '../actions';
 const defaultState = { byIds: {}, allIds: [] };
 const defaultStateForCurrent = {};
 const defaultUIState = {};
+const defaultConversationMode = 'text';
 
 const users = handleActions(
   {
@@ -71,6 +72,13 @@ const currentChat = handleActions(
   defaultStateForCurrent,
 );
 
+const conversationMode = handleActions(
+  {
+    [actions.setConversationMode]: (state, { payload: { mode } }) => mode,
+  },
+  defaultConversationMode,
+);
+
 const UIState = handleActions({}, defaultUIState);
 
 export default combineReducers({
@@ -79,5 +87,6 @@ export default combineReducers({
   messages,
   currentUser,
   currentChat,
+  conversationMode,
   UIState,
 });

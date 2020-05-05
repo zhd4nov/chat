@@ -74,6 +74,9 @@ const setCurrentUser = createAction('USER_SET_CURRENT');
 // Chat action
 const setCurrentChat = createAction('CHAT_SET_CURRENT');
 
+// Conversation mode
+const setConversationMode = createAction('CONVERSATION_MODE_UPDATE');
+
 // Wait for refactor (x)
 export {
   // Users
@@ -93,4 +96,6 @@ export {
   updateMessagesRequest,
   updateMessagesSuccess,
   updateMessagesFailure,
+  // Conversation mode
+  setConversationMode,
 };

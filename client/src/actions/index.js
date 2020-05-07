@@ -77,6 +77,10 @@ const setCurrentChat = createAction('CHAT_SET_CURRENT');
 // Conversation mode
 const setConversationMode = createAction('CONVERSATION_MODE_UPDATE');
 
+// VideoCall
+const updateVideoCall = createAction('VIDEO_CALL_UPDATE');
+const resetVideoCall = createAction('VIDEO_CALL_RESET');
+
 // Wait for refactor (x)
 export {
   // Users
@@ -98,4 +102,7 @@ export {
   updateMessagesFailure,
   // Conversation mode
   setConversationMode,
+  // Video
+  updateVideoCall,
+  resetVideoCall,
 };

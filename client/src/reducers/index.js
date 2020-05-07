@@ -79,7 +79,23 @@ const conversationMode = handleActions(
   defaultConversationMode,
 );
 
-const UIState = handleActions({}, defaultUIState);
+const defaultVideoCall = {
+  stream: null,
+  receivingCall: false,
+  callAccepted: false,
+  caller: '',
+  callerSignal: null,
+};
+
+const videoCall = handleActions(
+  {
+    [actions.updateVideoCall]: (state, { payload: { videoCall } }) => {
+      return { ...videoCall };
+    },
+    [actions.resetVideoCall]: () => defaultVideoCall,
+  },
+  defaultVideoCall,
+);
 
 export default combineReducers({
   users,
@@ -88,5 +104,5 @@ export default combineReducers({
   currentUser,
   currentChat,
   conversationMode,
-  UIState,
+  videoCall,
 });

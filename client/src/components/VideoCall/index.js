@@ -27,7 +27,7 @@ const getMediaData = async () => {
   try {
     stream = await navigator
       .mediaDevices
-      .getUserMedia({ audio: false, video: true });
+      .getUserMedia({ audio: true, video: true });
   } catch (e) {
     console.log(`Get user media fail: ${e}`);
   }
@@ -51,12 +51,6 @@ const VideoCall = (props) => {
         localVideo.current.srcObject = stream;
       }
     });
-
-    // return () => {
-    //   stream.getTracks().forEach((track) => {
-    //     track.stop();
-    //   });
-    // };
   }, []);
 
   const callPeer = (id) => {
@@ -68,6 +62,41 @@ const VideoCall = (props) => {
 
     peer.on('signal', (data) => {
       socket.emit('callUser', { userToCall: id, signalData: data, from: currentUser.id })
+    });
+
+    socket.on('callAccepted', (signal) => {
+      console.log('Call accepted');
+      const { updateVideoCall } = props;
+      updateVideoCall({ videoCall: { ...videoCall, callAccepted: true } });
+      peer.signal(signal);
+    });
+
+    peer.on('stream', (stream) => {
+      console.log('Got stream');
+      if (remoteVideo.current) {
+        remoteVideo.current.srcObject = stream;
+      }
+    });
+  };
+
+  const acceptCall = () => {
+    const { updateVideoCall } = props;
+    updateVideoCall({ videoCall: { ...videoCall, callAccepted: true } });
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
+
+    peer.on('signal', (data) => {
+      socket.emit('acceptCall', { signal: data, to: videoCall.caller });
+    });
+
+    peer.signal(videoCall.callerSignal);
+
+    peer.on('stream', (stream) => {
+      console.log('Got stream');
+      remoteVideo.current.srcObject = stream;
     });
   }
 
@@ -91,6 +120,7 @@ const VideoCall = (props) => {
           {/* onClick={acceptCall} */}
           <button onClick={() => {
             setWaitToCall(false);
+            acceptCall();
           }}>Accept Call</button>
         </CallBox>
       );
@@ -110,7 +140,7 @@ const VideoCall = (props) => {
   return (
     <Wrapper>
       <Container>
-        <Video playsInline ref={localVideo} autoPlay />
+        <Video playsInline muted ref={localVideo} autoPlay />
         {
           waitToCall
             ? renderCallButton()

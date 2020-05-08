@@ -153,6 +153,12 @@ io.on('connection', (socket) => {
     io.to(data.userToCall).emit('incoming', { signal: data.signalData, from: data.from });
   });
 
+  socket.on('acceptCall', (data) => {
+    console.log('User accept call...');
+    io.to(data.to).emit('callAccepted', data.signal);
+    console.log('Call accepted emit', data.to);
+  });
+
   // RESET stores
   socket.on('disconnect', async () => {
     // Remove all track where the current user is host

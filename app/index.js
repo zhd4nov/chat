@@ -147,6 +147,12 @@ io.on('connection', (socket) => {
     console.log('User remove chat. Removing messages... Removed: ', messages.length - restMessages.length, chatId);
   });
 
+  // Video call
+  socket.on('callUser', (data) => {
+    console.log(`Emit to ${data.userToCall} incoming call`);
+    io.to(data.userToCall).emit('incoming', { signal: data.signalData, from: data.from });
+  });
+
   // RESET stores
   socket.on('disconnect', async () => {
     // Remove all track where the current user is host

@@ -113,7 +113,6 @@ io.on('connection', (socket) => {
     newChat.saveChat();
 
     socket.emit(events.ADD_CHAT_FROM_SERVER, newChat);
-    console.log(`New chat was cteated by user: ${newChat}`);
   });
 
   socket.on(events.DELETE_CHAT_FROM_CLIENT, async (chatID) => {
@@ -136,7 +135,6 @@ io.on('connection', (socket) => {
     message.saveMessage();
     // Send messages event to ALL sockets
     io.sockets.emit(events.ADD_MESSAGE_FROM_SERVER, null);
-    console.log('We have a new message: ', message);
   });
 
   socket.on(events.DELETE_CHAT_FROM_CLIENT, async (chatId) => {
@@ -144,19 +142,19 @@ io.on('connection', (socket) => {
     const messages = await Message.getAllMessages();
     const restMessages = messages.filter((message) => message.chatId !== chatId);
     await Message.updateMessages(restMessages);
-    console.log('User remove chat. Removing messages... Removed: ', messages.length - restMessages.length, chatId);
   });
 
   // Video call
   socket.on('callUser', (data) => {
-    console.log(`Emit to ${data.userToCall} incoming call`);
     io.to(data.userToCall).emit('incoming', { signal: data.signalData, from: data.from });
   });
 
   socket.on('acceptCall', (data) => {
-    console.log('User accept call...');
     io.to(data.to).emit('callAccepted', data.signal);
-    console.log('Call accepted emit', data.to);
+  });
+
+  socket.on('endCall', (data) => {
+    socket.broadcast.emit('endCall', data);
   });
 
   // RESET stores

@@ -65,17 +65,27 @@ const VideoCall = (props) => {
     });
 
     socket.on('callAccepted', (signal) => {
-      console.log('Call accepted');
       const { updateVideoCall } = props;
       updateVideoCall({ videoCall: { ...videoCall, callAccepted: true } });
       peer.signal(signal);
     });
 
     peer.on('stream', (stream) => {
-      console.log('Got stream');
       if (remoteVideo.current) {
         remoteVideo.current.srcObject = stream;
       }
+    });
+
+    socket.on('endCall', () => {
+      const { setConversationMode } = props;
+      // Hide video call window
+      setConversationMode({ mode: 'text' });
+      // Disable stream
+      stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+      // Close connection
+      peer.destroy();
     });
   };
 
@@ -95,15 +105,30 @@ const VideoCall = (props) => {
     peer.signal(videoCall.callerSignal);
 
     peer.on('stream', (stream) => {
-      console.log('Got stream');
       remoteVideo.current.srcObject = stream;
     });
-  }
 
+    socket.on('endCall', () => {
+      // Hide video call window
+      const { setConversationMode } = props;
+      setConversationMode({ mode: 'text' });
+      // Disable stream
+      stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+      // Close connection
+      peer.destroy();
+    });
+  }
+  // TODO: Refactor end call process
   const handleEndCall = (e) => {
     e.preventDefault();
     const { setConversationMode } = props;
     setConversationMode({ mode: 'text' });
+    socket.emit('endCall', { from: currentUser.id, name: currentUser.name });
+    stream.getTracks().forEach((track) => {
+      track.stop();
+    });
   };
 
 

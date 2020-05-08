@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
+import Peer from 'simple-peer';
 import styled from 'styled-components';
 
 import * as actions from '../../actions';
@@ -7,6 +8,9 @@ import * as actions from '../../actions';
 const mapStateToProps = (state) => {
   const props = {
     currentUser: state.currentUser,
+    chats: state.chats,
+    currentChat: state.currentChat,
+    videoCall: state.videoCall,
   };
 
   return props;
@@ -14,6 +18,7 @@ const mapStateToProps = (state) => {
 
 const actionCreators = {
   setConversationMode: actions.setConversationMode,
+  updateVideoCall: actions.updateVideoCall,
 };
 
 const getMediaData = async () => {
@@ -31,27 +36,40 @@ const getMediaData = async () => {
 };
 
 const VideoCall = (props) => {
-  const { currentUser } = props;
+  const { currentUser, socket, videoCall } = props;
 
-  const videoRef = useRef(null);
+  const [waitToCall, setWaitToCall] = useState(true);
+  const [stream, setStream] = useState();
+
+  const localVideo = useRef(null);
+  const remoteVideo = useRef(null);
 
   useEffect(() => {
-    let stream;
+    getMediaData().then((stream) => {
+      setStream(stream);
+      if (localVideo.current) {
+        localVideo.current.srcObject = stream;
+      }
+    });
 
-    const mountStream = async () => {
-      stream = await getMediaData();
-      videoRef.current.srcObject = stream;
-      console.log('Mount media is done.');
-    };
+    // return () => {
+    //   stream.getTracks().forEach((track) => {
+    //     track.stop();
+    //   });
+    // };
+  }, []);
 
-    mountStream();
+  const callPeer = (id) => {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: stream,
+    });
 
-    return () => {
-      stream.getTracks().forEach((track) => {
-        track.stop();
-      });
-    };
-  }, [videoRef]);
+    peer.on('signal', (data) => {
+      socket.emit('callUser', { userToCall: id, signalData: data, from: currentUser.id })
+    });
+  }
 
   const handleEndCall = (e) => {
     e.preventDefault();
@@ -59,15 +77,47 @@ const VideoCall = (props) => {
     setConversationMode({ mode: 'text' });
   };
 
+
+  const renderCallButton = () => {
+    const { chats, currentChat } = props;
+    const partner = chats
+      .byIds[currentChat]
+      .memberIDs
+      .filter((id) => id !== currentUser.id);
+
+    if (videoCall.receivingCall) {
+      return (
+        <CallBox>
+          {/* onClick={acceptCall} */}
+          <button onClick={() => {
+            setWaitToCall(false);
+          }}>Accept Call</button>
+        </CallBox>
+      );
+    }
+
+    return (
+      <CallBox>
+        {/* onClick={callPeer} */}
+        <button onClick={() => {
+          setWaitToCall(false);
+          callPeer(partner);
+        }}>Call Partner</button>
+      </CallBox>
+    );
+  };
+
   return (
     <Wrapper>
       <Container>
-        <p>{currentUser.name}</p>
-        <Video ref={videoRef} autoPlay>
-          <p>What</p>
-        </Video>
+        <Video playsInline ref={localVideo} autoPlay />
+        {
+          waitToCall
+            ? renderCallButton()
+            : <Video playsInline ref={remoteVideo} autoPlay />
+        }
         <EndCall onClick={handleEndCall} >
-          End Call
+          Hang up
         </EndCall>
       </Container>
     </Wrapper>
@@ -75,7 +125,7 @@ const VideoCall = (props) => {
 };
 
 const Wrapper = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -88,32 +138,52 @@ const Wrapper = styled.div`
 `;
 
 const Container = styled.div`
-  width: 50vmax;
-  max-width: 100vw;
-  height: 50vmax;
-  max-height: 100vh;
+  position: relative;
+  width: 75%;
+  height: 90%;
   background: #fff;
   text-align: center;
-  padding-top: 1em;
+  padding: .5em;
   margin: auto;
 
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row wrap;
   align-items: center;
 `;
 
 const Video = styled.video`
-  width: 100%;
-  height: 80%;
+  margin: .5em;
+  width: calc(50% - 1em);
+`;
+
+const CallBox = styled.div`
+  margin: .5em;
+  width: calc(50% - 1em);
+  > button {
+    color: #fff;
+    background-color: green;
+    border: none;
+    padding: 1em 2em;
+    cursor: pointer;
+    :hover {
+      filter: saturate(1.2);
+    }
+  }
 `;
 
 const EndCall = styled.button`
+  position: absolute;
+  top: 1em;
+  left: 1em;
+
   border: none;
   background: tomato;
   color: #fff;
   padding: 1em 2em;
-  margin-top: auto;
-  margin-bottom: 1em;
+  cursor: pointer;
+  :hover {
+    filter: saturate(1.2);
+  }
 `;
 
 export default connect(mapStateToProps, actionCreators)(VideoCall);

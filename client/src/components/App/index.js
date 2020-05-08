@@ -23,6 +23,7 @@ const mapStateToProps = (state) => {
   const props = {
     currentUser: state.currentUser,
     conversationMode: state.conversationMode,
+    videoCall: state.videoCall,
   };
 
   return props;
@@ -34,13 +35,30 @@ const actionCreators = {
   updateMessages: actions.updateMessages,
   setCurrentUser: actions.setCurrentUser,
   setCurrentChat: actions.setCurrentChat,
+  setConversationMode: actions.setConversationMode,
+  updateVideoCall: actions.updateVideoCall,
 };
 
 const App = (props) => { // Props include state and actions
   // Get app state from props
-  const { currentUser, conversationMode } = props;
+  const { currentUser, conversationMode, videoCall } = props;
 
   useEffect(() => {
+    // Call handler
+    socket.on('incoming', (data) => {
+      const { updateVideoCall, setConversationMode } = props;
+      // Render block with video
+      setConversationMode({ mode: 'video' });
+
+      updateVideoCall({
+        videoCall: {
+          ...videoCall,
+          receivingCall: true,
+          caller: data.from,
+          callerSignal: data.signal,
+        },
+      });
+    });
     // Get actual state from server
     // TODO: Refactor - one function (?)
     const fetchChats = () => {
@@ -107,7 +125,7 @@ const App = (props) => { // Props include state and actions
           <Messages />
           <SendingForm socket={socket} />
         </ChatViewport>
-        {conversationMode === 'video' && <VideoCall />}
+        {conversationMode === 'video' && <VideoCall socket={socket} />}
       </Workspace>
     </Fragment>
   );

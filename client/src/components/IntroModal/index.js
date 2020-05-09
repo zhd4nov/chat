@@ -41,6 +41,9 @@ const IntroModal = (props) => {
     const userInfo = { hasInvite, chatId, name };
     // Send user data
     socket.emit(events.ADD_USER_FROM_CLIENT, userInfo);
+
+    // Delete invite cookie
+    cookie.remove('invite');
   };
 
   const handleInput = (e) => {

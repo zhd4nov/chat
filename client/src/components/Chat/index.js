@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import events from '../../events';
 import * as actions from '../../actions';
+
+import Controlls from './Controlls';
 
 const mapStateToProps = (state) => {
   const props = {
@@ -20,19 +21,9 @@ const actionCreators = {
 
 // TODO: Rename chat, Invite link right into card
 const Chat = (props) => {
-  const { chat, currentChat, currentUser, socket } = props;
+  const { chat, currentChat, socket } = props;
 
   const isCurrentChat = () => chat.id === currentChat;
-
-  const handleRemoveChat = (chat) => (e) => {
-    e.preventDefault();
-    // Only hostUser can do it (!) check...
-    if (chat.hostUserID === currentUser.id) {
-      socket.emit(events.DELETE_CHAT_FROM_CLIENT, chat.id)
-    } else {
-      // TODO: set behavior if forbiden
-    }
-  };
 
   const handleCurrentChat = (id) => () => {
     const { setCurrentChat } = props;
@@ -42,8 +33,8 @@ const Chat = (props) => {
   // Define component option:
   const activeChat = (
     <CurrentChatContainer>
+      <Controlls chat={chat} socket={socket} />
       <Title active>{chat.name}</Title>
-      <CloseCross onClick={handleRemoveChat(chat)} >&#10006;</CloseCross>
     </CurrentChatContainer>
   );
 
@@ -60,7 +51,7 @@ const Chat = (props) => {
 const Container = styled.div`
   position: relative;
   width: 100%;
-  height: 7vh;
+  height: 10vh;
 
   display: flex;
   background: ${(props) => props.active ? '#' : 'transparent'};
@@ -77,36 +68,18 @@ const Container = styled.div`
     height: 1px;
     background: #bababa;
   }
-`
+`;
 
 const CurrentChatContainer = styled(Container)`
   ::after {
     background: royalblue;
   }
-`
+`;
 
 const Title = styled.p`
   width: fit-content;
   margin: auto;
   color: ${(props) => props.active ? 'royalblue' : '#bababa'};
-`
-
-const CloseCross = styled.button`
-  position: absolute;
-  top: 1em;
-  left: 10%;
-
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: .7em;
-  color: #39393a;
-  cursor: pointer;
-  transition: all .2s;
-
-  :hover {
-    color: tomato;
-  }
-`
+`;
 
 export default connect(mapStateToProps, actionCreators)(Chat);
